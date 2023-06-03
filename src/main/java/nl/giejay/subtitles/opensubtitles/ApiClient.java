@@ -27,7 +27,6 @@ public class ApiClient {
   private Map<String, Interceptor> apiAuthorizations;
   private OkHttpClient.Builder okBuilder;
   private Retrofit.Builder adapterBuilder;
-  private JSON json;
   private OkHttpClient okHttpClient;
 
   public ApiClient() {
@@ -91,8 +90,6 @@ public class ApiClient {
   }
 
   public void createDefaultAdapter() {
-    json = new JSON();
-
     String baseUrl = "https://api.opensubtitles.com/api/v1";
     if (!baseUrl.endsWith("/"))
       baseUrl = baseUrl + "/";
@@ -101,7 +98,7 @@ public class ApiClient {
       .Builder()
       .baseUrl(baseUrl)
       .addConverterFactory(ScalarsConverterFactory.create())
-      .addConverterFactory(GsonCustomConverterFactory.create(json.getGson()));
+      .addConverterFactory(GsonCustomConverterFactory.create(new Gson()));
   }
 
   public <S> S createService(Class<S> serviceClass) {
@@ -113,12 +110,12 @@ public class ApiClient {
   }
 
   public ApiClient setDateFormat(DateFormat dateFormat) {
-    this.json.setDateFormat(dateFormat);
+//    this.json.setDateFormat(dateFormat);
     return this;
   }
 
   public ApiClient setSqlDateFormat(DateFormat dateFormat) {
-    this.json.setSqlDateFormat(dateFormat);
+//    this.json.setSqlDateFormat(dateFormat);
     return this;
   }
 

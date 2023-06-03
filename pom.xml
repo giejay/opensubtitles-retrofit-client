@@ -5,7 +5,7 @@
     <artifactId>opensubtitles-retrofit-client</artifactId>
     <packaging>jar</packaging>
     <name>opensubtitles-retrofit-client</name>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <url>https://github.com/giejay/opensubtitles-retrofit-client</url>
     <description>OpenSubtitles.com Retrofit API client</description>
 
@@ -184,11 +184,11 @@
     </profiles>
 
     <dependencies>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>${swagger-annotations-version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.swagger</groupId>-->
+<!--            <artifactId>swagger-annotations</artifactId>-->
+<!--            <version>${swagger-annotations-version}</version>-->
+<!--        </dependency>-->
         <!-- @Nullable annotation -->
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
@@ -210,22 +210,22 @@
             <artifactId>converter-scalars</artifactId>
             <version>${retrofit-version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.oltu.oauth2</groupId>
-            <artifactId>org.apache.oltu.oauth2.client</artifactId>
-            <version>${oltu-version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.oltu.oauth2</groupId>
-                    <artifactId>common</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.gsonfire</groupId>
-            <artifactId>gson-fire</artifactId>
-            <version>${gson-fire-version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.oltu.oauth2</groupId>-->
+<!--            <artifactId>org.apache.oltu.oauth2.client</artifactId>-->
+<!--            <version>${oltu-version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.oltu.oauth2</groupId>-->
+<!--                    <artifactId>common</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.gsonfire</groupId>-->
+<!--            <artifactId>gson-fire</artifactId>-->
+<!--            <version>${gson-fire-version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
