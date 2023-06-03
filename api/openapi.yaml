@@ -1,0 +1,5562 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: support@opensubtitles.org
+    name: OpenSubtitles API Support
+    url: http://www.opensubtitles.com/en/contact/
+  description: Explore subtitles API here
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://www.opensubtitles.com/en/tos/
+  title: OpenSubtitles API
+  version: 1.0.1
+servers:
+- description: Default server
+  url: https://api.opensubtitles.com/api/v1
+- description: VIP server
+  url: https://vip-api.opensubtitles.com/api/v1
+security:
+- Api-Key: []
+- Bearer: []
+tags:
+- description: General API infos
+  name: Infos
+- description: Authentification of user
+  name: Authentication
+- description: "Discover popular, latest and most downloaded subtitles"
+  name: Discover
+- description: Download of subtitles
+  name: Download
+- description: Subtitles search for a specific release
+  name: Subtitles
+- description: Search for feature
+  name: Features
+- description: Various utilities
+  name: Utilities
+paths:
+  /login:
+    post:
+      deprecated: false
+      description: |-
+        Create a token to authenticate a user. If response code is ```401 Unathorized``` stop sending further requests with the same credentials.
+
+        Request rate limit is 1 request per 1 second.
+
+        Further API requests must continue on returned ```base_url``` host, which can have different cache time for search results and different request rate limits.
+      operationId: login
+      parameters:
+      - description: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: true
+        schema:
+          default: application/json
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login_request'
+        required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                user:
+                  allowed_downloads: 100
+                  allowed_translations: 5
+                  level: Sub leecher
+                  user_id: 66
+                  ext_installed: false
+                  vip: false
+                base_url: api.opensubtitles.com
+                token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEOU5aaWUyVjhWOU1hTnJVZWVvcEEwWUNoWEt6Wkx3NiIsImV4cCI6MTYwNDM1ODAwMH0.sMibjAFnkcs-HJ4zhdCwBeGrZ_UvzMbgl5NxYV2uALM
+                status: 200
+              schema:
+                $ref: '#/components/schemas/login_200_response'
+          description: Create session and token
+      security:
+      - Api-Key: []
+      summary: Login
+      tags:
+      - Authentication
+      x-content-type: application/json
+      x-accepts: application/json
+  /logout:
+    delete:
+      deprecated: false
+      description: Destroy a user token to end a session. Bearer token is required
+        for this endpoint.
+      operationId: logout
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                message: token successfully destroyed
+                status: 200
+              schema:
+                type: object
+          description: Destroy session and current token
+      security:
+      - Bearer: []
+      - Api-Key: []
+      summary: Logout
+      tags:
+      - Authentication
+      x-accepts: application/json
+  /infos/formats:
+    get:
+      deprecated: false
+      description: 'List subtitle formats recognized by the API  '
+      operationId: formats
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                example:
+                  value:
+                    data:
+                      output_formats:
+                      - srt
+                      - sub
+                      - mpl
+                      - webvtt
+                      - dfxp
+                      - txt
+              schema:
+                $ref: '#/components/schemas/formats_200_response'
+            example:
+              example:
+                data:
+                  output_formats:
+                  - srt
+                  - sub
+                  - mpl
+                  - webvtt
+                  - dfxp
+                  - txt
+                value:
+                  data:
+                    output_formats:
+                    - srt
+                    - sub
+                    - mpl
+                    - webvtt
+                    - dfxp
+                    - txt
+          description: OK
+      security:
+      - Api-Key: []
+      summary: Subtitle Formats
+      tags:
+      - Infos
+      x-accepts: application/json
+  /infos/languages:
+    get:
+      deprecated: false
+      description: Get the languages information
+      operationId: languages
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                data:
+                - language_code: af
+                  language_name: Afrikaans
+                - language_code: sq
+                  language_name: Albanian
+                - language_code: ar
+                  language_name: Arabic
+                - language_code: an
+                  language_name: Aragonese
+                - language_code: hy
+                  language_name: Armenian
+                - language_code: at
+                  language_name: Asturian
+                - language_code: eu
+                  language_name: Basque
+                - language_code: be
+                  language_name: Belarusian
+                - language_code: bn
+                  language_name: Bengali
+                - language_code: bs
+                  language_name: Bosnian
+                - language_code: br
+                  language_name: Breton
+                - language_code: bg
+                  language_name: Bulgarian
+                - language_code: my
+                  language_name: Burmese
+                - language_code: ca
+                  language_name: Catalan
+                - language_code: zh-cn
+                  language_name: Chinese (simplified)
+                - language_code: cs
+                  language_name: Czech
+                - language_code: da
+                  language_name: Danish
+                - language_code: nl
+                  language_name: Dutch
+                - language_code: en
+                  language_name: English
+                - language_code: eo
+                  language_name: Esperanto
+                - language_code: et
+                  language_name: Estonian
+                - language_code: fi
+                  language_name: Finnish
+                - language_code: fr
+                  language_name: French
+                - language_code: ka
+                  language_name: Georgian
+                - language_code: de
+                  language_name: German
+                - language_code: gl
+                  language_name: Galician
+                - language_code: el
+                  language_name: Greek
+                - language_code: he
+                  language_name: Hebrew
+                - language_code: hi
+                  language_name: Hindi
+                - language_code: hr
+                  language_name: Croatian
+                - language_code: hu
+                  language_name: Hungarian
+                - language_code: is
+                  language_name: Icelandic
+                - language_code: id
+                  language_name: Indonesian
+                - language_code: it
+                  language_name: Italian
+                - language_code: ja
+                  language_name: Japanese
+                - language_code: kk
+                  language_name: Kazakh
+                - language_code: km
+                  language_name: Khmer
+                - language_code: ko
+                  language_name: Korean
+                - language_code: lv
+                  language_name: Latvian
+                - language_code: lt
+                  language_name: Lithuanian
+                - language_code: lb
+                  language_name: Luxembourgish
+                - language_code: mk
+                  language_name: Macedonian
+                - language_code: ml
+                  language_name: Malayalam
+                - language_code: ms
+                  language_name: Malay
+                - language_code: ma
+                  language_name: Manipuri
+                - language_code: mn
+                  language_name: Mongolian
+                - language_code: "no"
+                  language_name: Norwegian
+                - language_code: oc
+                  language_name: Occitan
+                - language_code: fa
+                  language_name: Persian
+                - language_code: pl
+                  language_name: Polish
+                - language_code: pt-pt
+                  language_name: Portuguese
+                - language_code: ru
+                  language_name: Russian
+                - language_code: sr
+                  language_name: Serbian
+                - language_code: si
+                  language_name: Sinhalese
+                - language_code: sk
+                  language_name: Slovak
+                - language_code: sl
+                  language_name: Slovenian
+                - language_code: es
+                  language_name: Spanish
+                - language_code: sw
+                  language_name: Swahili
+                - language_code: sv
+                  language_name: Swedish
+                - language_code: sy
+                  language_name: Syriac
+                - language_code: ta
+                  language_name: Tamil
+                - language_code: te
+                  language_name: Telugu
+                - language_code: tl
+                  language_name: Tagalog
+                - language_code: th
+                  language_name: Thai
+                - language_code: tr
+                  language_name: Turkish
+                - language_code: uk
+                  language_name: Ukrainian
+                - language_code: ur
+                  language_name: Urdu
+                - language_code: uz
+                  language_name: Uzbek
+                - language_code: vi
+                  language_name: Vietnamese
+                - language_code: ro
+                  language_name: Romanian
+                - language_code: pt-br
+                  language_name: Portuguese (Brazilian)
+                - language_code: me
+                  language_name: Montenegrin
+                - language_code: zh-tw
+                  language_name: Chinese (traditional)
+                - language_code: ze
+                  language_name: Chinese bilingual
+              schema:
+                $ref: '#/components/schemas/languages_200_response'
+            example:
+              example:
+                data:
+                - language_code: af
+                  language_name: Afrikaans
+                - language_code: sq
+                  language_name: Albanian
+                - language_code: ar
+                  language_name: Arabic
+                - language_code: an
+                  language_name: Aragonese
+                - language_code: hy
+                  language_name: Armenian
+                - language_code: at
+                  language_name: Asturian
+                - language_code: eu
+                  language_name: Basque
+                - language_code: be
+                  language_name: Belarusian
+                - language_code: bn
+                  language_name: Bengali
+                - language_code: bs
+                  language_name: Bosnian
+                - language_code: br
+                  language_name: Breton
+                - language_code: bg
+                  language_name: Bulgarian
+                - language_code: my
+                  language_name: Burmese
+                - language_code: ca
+                  language_name: Catalan
+                - language_code: zh-cn
+                  language_name: Chinese (simplified)
+                - language_code: cs
+                  language_name: Czech
+                - language_code: da
+                  language_name: Danish
+                - language_code: nl
+                  language_name: Dutch
+                - language_code: en
+                  language_name: English
+                - language_code: eo
+                  language_name: Esperanto
+                - language_code: et
+                  language_name: Estonian
+                - language_code: fi
+                  language_name: Finnish
+                - language_code: fr
+                  language_name: French
+                - language_code: ka
+                  language_name: Georgian
+                - language_code: de
+                  language_name: German
+                - language_code: gl
+                  language_name: Galician
+                - language_code: el
+                  language_name: Greek
+                - language_code: he
+                  language_name: Hebrew
+                - language_code: hi
+                  language_name: Hindi
+                - language_code: hr
+                  language_name: Croatian
+                - language_code: hu
+                  language_name: Hungarian
+                - language_code: is
+                  language_name: Icelandic
+                - language_code: id
+                  language_name: Indonesian
+                - language_code: it
+                  language_name: Italian
+                - language_code: ja
+                  language_name: Japanese
+                - language_code: kk
+                  language_name: Kazakh
+                - language_code: km
+                  language_name: Khmer
+                - language_code: ko
+                  language_name: Korean
+                - language_code: lv
+                  language_name: Latvian
+                - language_code: lt
+                  language_name: Lithuanian
+                - language_code: lb
+                  language_name: Luxembourgish
+                - language_code: mk
+                  language_name: Macedonian
+                - language_code: ml
+                  language_name: Malayalam
+                - language_code: ms
+                  language_name: Malay
+                - language_code: ma
+                  language_name: Manipuri
+                - language_code: mn
+                  language_name: Mongolian
+                - language_code: "no"
+                  language_name: Norwegian
+                - language_code: oc
+                  language_name: Occitan
+                - language_code: fa
+                  language_name: Persian
+                - language_code: pl
+                  language_name: Polish
+                - language_code: pt-pt
+                  language_name: Portuguese
+                - language_code: ru
+                  language_name: Russian
+                - language_code: sr
+                  language_name: Serbian
+                - language_code: si
+                  language_name: Sinhalese
+                - language_code: sk
+                  language_name: Slovak
+                - language_code: sl
+                  language_name: Slovenian
+                - language_code: es
+                  language_name: Spanish
+                - language_code: sw
+                  language_name: Swahili
+                - language_code: sv
+                  language_name: Swedish
+                - language_code: sy
+                  language_name: Syriac
+                - language_code: ta
+                  language_name: Tamil
+                - language_code: te
+                  language_name: Telugu
+                - language_code: tl
+                  language_name: Tagalog
+                - language_code: th
+                  language_name: Thai
+                - language_code: tr
+                  language_name: Turkish
+                - language_code: uk
+                  language_name: Ukrainian
+                - language_code: ur
+                  language_name: Urdu
+                - language_code: uz
+                  language_name: Uzbek
+                - language_code: vi
+                  language_name: Vietnamese
+                - language_code: ro
+                  language_name: Romanian
+                - language_code: pt-br
+                  language_name: Portuguese (Brazilian)
+                - language_code: me
+                  language_name: Montenegrin
+                - language_code: zh-tw
+                  language_name: Chinese (traditional)
+                - language_code: ze
+                  language_name: Chinese bilingual
+                - language_code: se
+                  language_name: Northern Sami
+          description: Get the languages table containing the codes and names used
+            through the API
+      security:
+      - Api-Key: []
+      summary: Languages
+      tags:
+      - Infos
+      x-accepts: application/json
+  /infos/user:
+    get:
+      deprecated: false
+      description: "Gather informations about the user authenticated by a bearer token.\
+        \ User information are already sent when user is authenticated, and the remaining\
+        \ downloads is returned with each download, but you can also get these information\
+        \ here."
+      operationId: userinfo
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                data:
+                  allowed_downloads: 100
+                  level: Sub leecher
+                  user_id: 66
+                  ext_installed: false
+                  vip: false
+                  downloads_count: 1
+                  remaining_downloads: 99
+              schema:
+                $ref: '#/components/schemas/userinfo_200_response'
+          description: Get user data
+      security:
+      - Bearer: []
+      - Api-Key: []
+      summary: User Informations
+      tags:
+      - Infos
+      x-accepts: application/json
+  /discover/popular:
+    get:
+      deprecated: false
+      description: "Discover popular features on opensubtitles.com, according to last\
+        \ 30 days downloads."
+      operationId: popular
+      parameters:
+      - description: "Language code(s), coma separated (en,fr) or \"all\""
+        explode: true
+        in: query
+        name: languages
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Type (movie or tvshow)
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subtitle'
+          description: OK
+      security:
+      - Api-Key: []
+      summary: Popular features
+      tags:
+      - Discover
+      x-accepts: application/json
+  /discover/latest:
+    get:
+      description: Lists 60 latest uploaded subtitles
+      operationId: latest
+      parameters:
+      - description: "Language code(s), coma separated (en,fr) or \"all\""
+        explode: true
+        in: query
+        name: languages
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Type (movie or tvshow)
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                example:
+                  value:
+                    total_pages: 1
+                    total_count: 10
+                    page: 1
+                    data:
+                    - id: string
+                      type: string
+                      attributes:
+                        subtitle_id: string
+                        language: string
+                        download_count: 0
+                        new_download_count: 0
+                        hearing_impaired: true
+                        hd: true
+                        format: {}
+                        fps: 0
+                        votes: 0
+                        points: 0
+                        ratings: 0
+                        from_trusted: true
+                        foreign_parts_only: true
+                        ai_translated: true
+                        machine_translated: {}
+                        upload_date: string
+                        release: string
+                        comments: string
+                        legacy_subtitle_id: 0
+                        uploader:
+                          uploader_id: 0
+                          name: string
+                          rank: string
+                        feature_details:
+                          feature_id: 0
+                          feature_type: string
+                          year: 0
+                          title: string
+                          movie_name: string
+                          imdb_id: 0
+                          tmdb_id: {}
+                        url: string
+                        related_links:
+                          label: string
+                          url: string
+                          img_url: string
+                        files:
+                        - file_id: 0
+                          cd_number: 0
+                          file_name: string
+              schema:
+                $ref: '#/components/schemas/latest_200_response'
+            example:
+              example:
+                total_pages: 1
+                total_count: 60
+                page: 1
+                data:
+                - id: "6150116"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "6150116"
+                    language: sv
+                    download_count: 0
+                    new_download_count: 0
+                    hearing_impaired: false
+                    hd: true
+                    fps: 0
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: true
+                    foreign_parts_only: false
+                    ai_translated: false
+                    upload_date: 2021-11-10T13:48:58.000Z
+                    release: No.Sudden.Move.2021.1080p.WEB.H264-TIMECUT
+                    comments: ""
+                    legacy_subtitle_id: 8871896
+                    uploader:
+                      uploader_id: 83676
+                      name: Nemo_
+                      rank: Trusted member
+                    feature_details:
+                      feature_id: 1226096
+                      feature_type: Movie
+                      year: 2021
+                      title: No Sudden Move
+                      movie_name: 2021 - No Sudden Move
+                      imdb_id: 11525644
+                      tmdb_id: 649409
+                    url: https://www.opensubtitles.com/sv/subtitles/legacy/8871896
+                    related_links:
+                      label: All subtitles for No Sudden Move
+                      url: https://www.opensubtitles.com/sv/movies/2021-no-sudden-move
+                      img_url: https://s9.osdb.link/features/6/9/0/1226096.jpg
+                    files:
+                    - file_id: 7086008
+                      cd_number: 1
+                      file_name: No.Sudden.Move.2021.1080p.WEB.H264-TIMECUT.srt
+                - id: "6150127"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "6150127"
+                    language: zh-CN
+                    download_count: 12
+                    new_download_count: 2
+                    hearing_impaired: false
+                    hd: true
+                    fps: 0
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    upload_date: 2021-11-10T13:45:35.000Z
+                    release: Shang.Chi.and.the.Legend.of.the.Ten.Rings.2021.COMPLETE.UHD.BLURAY-SURCODE
+                    comments: ""
+                    legacy_subtitle_id: 8871895
+                    uploader:
+                      uploader_id: 0
+                      name: Anonymous
+                      rank: anonymous
+                    feature_details:
+                      feature_id: 1218697
+                      feature_type: Movie
+                      year: 2021
+                      title: Shang-Chi and the Legend of the Ten Rings
+                      movie_name: 2021 - Shang-Chi and the Legend of the Ten Rings
+                      imdb_id: 9376612
+                      tmdb_id: 566525
+                    url: https://www.opensubtitles.com/zh-CN/subtitles/legacy/8871895
+                    related_links:
+                      label: All subtitles for Shang-Chi and the Legend of the Ten
+                        Rings
+                      url: https://www.opensubtitles.com/zh-CN/movies/2021-shang-chi-and-the-legend-of-the-ten-rings
+                      img_url: https://s9.osdb.link/features/7/9/6/1218697.jpg
+                    files:
+                    - file_id: 7086014
+                      cd_number: 1
+                      file_name: Shang.Chi.and.the.Legend.of.the.Ten.Rings.2021.COMPLETE.UHD.BLURAY-SURCODE.ass
+                value:
+                  total_pages: 1
+                  total_count: 60
+                  page: 1
+                  data:
+                  - id: "6150116"
+                    type: subtitle
+                    attributes:
+                      subtitle_id: "6150116"
+                      language: sv
+                      download_count: 0
+                      new_download_count: 0
+                      hearing_impaired: false
+                      hd: true
+                      fps: 0
+                      votes: 0
+                      points: 0
+                      ratings: 0
+                      from_trusted: true
+                      foreign_parts_only: false
+                      ai_translated: false
+                      upload_date: 2021-11-10T13:48:58.000Z
+                      release: No.Sudden.Move.2021.1080p.WEB.H264-TIMECUT
+                      comments: ""
+                      legacy_subtitle_id: 8871896
+                      uploader:
+                        uploader_id: 83676
+                        name: Nemo_
+                        rank: Trusted member
+                      feature_details:
+                        feature_id: 1226096
+                        feature_type: Movie
+                        year: 2021
+                        title: No Sudden Move
+                        movie_name: 2021 - No Sudden Move
+                        imdb_id: 11525644
+                        tmdb_id: 649409
+                      url: https://www.opensubtitles.com/sv/subtitles/legacy/8871896
+                      related_links:
+                        label: All subtitles for No Sudden Move
+                        url: https://www.opensubtitles.com/sv/movies/2021-no-sudden-move
+                        img_url: https://s9.osdb.link/features/6/9/0/1226096.jpg
+                      files:
+                      - file_id: 7086008
+                        cd_number: 1
+                        file_name: No.Sudden.Move.2021.1080p.WEB.H264-TIMECUT.srt
+                  - id: "6150127"
+                    type: subtitle
+                    attributes:
+                      subtitle_id: "6150127"
+                      language: zh-CN
+                      download_count: 12
+                      new_download_count: 2
+                      hearing_impaired: false
+                      hd: true
+                      fps: 0
+                      votes: 0
+                      points: 0
+                      ratings: 0
+                      from_trusted: false
+                      foreign_parts_only: false
+                      ai_translated: false
+                      upload_date: 2021-11-10T13:45:35.000Z
+                      release: Shang.Chi.and.the.Legend.of.the.Ten.Rings.2021.COMPLETE.UHD.BLURAY-SURCODE
+                      comments: ""
+                      legacy_subtitle_id: 8871895
+                      uploader:
+                        name: Anonymous
+                        rank: anonymous
+                      feature_details:
+                        feature_id: 1218697
+                        feature_type: Movie
+                        year: 2021
+                        title: Shang-Chi and the Legend of the Ten Rings
+                        movie_name: 2021 - Shang-Chi and the Legend of the Ten Rings
+                        imdb_id: 9376612
+                        tmdb_id: 566525
+                      url: https://www.opensubtitles.com/zh-CN/subtitles/legacy/8871895
+                      related_links:
+                        label: All subtitles for Shang-Chi and the Legend of the Ten
+                          Rings
+                        url: https://www.opensubtitles.com/zh-CN/movies/2021-shang-chi-and-the-legend-of-the-ten-rings
+                        img_url: https://s9.osdb.link/features/7/9/6/1218697.jpg
+                      files:
+                      - file_id: 7086014
+                        cd_number: 1
+                        file_name: Shang.Chi.and.the.Legend.of.the.Ten.Rings.2021.COMPLETE.UHD.BLURAY-SURCODE.ass
+          description: OK
+      security:
+      - Api-Key: []
+      summary: Latest subtitles
+      tags:
+      - Discover
+      x-accepts: application/json
+  /discover/most_downloaded:
+    get:
+      deprecated: false
+      description: "Discover popular subtitles, according to last 30 days downloads\
+        \ on opensubtitles.com. This list can be filtered by language code or feature\
+        \ type (movie, episode)"
+      operationId: most_downloaded
+      parameters:
+      - description: "Language code(s), coma separated (en,fr), or \"all\""
+        explode: true
+        in: query
+        name: languages
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Type (movie or tvshow)
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                total_pages: 1
+                total_count: 46
+                page: 1
+                data:
+                - id: "493023"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "493023"
+                    language: nl
+                    download_count: 3889
+                    new_download_count: 11
+                    hearing_impaired: false
+                    hd: false
+                    format: srt
+                    fps: 29.97
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2010-11-15T14:55:39.000Z
+                    release: Major League WS DVDRip
+                    comments: ""
+                    legacy_subtitle_id: 3956266
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 518105
+                      feature_type: Movie
+                      year: 1989
+                      title: Major League
+                      movie_name: 1989 - Major League
+                      imdb_id: 97815
+                      tmdb_id: 9942
+                    url: https://www.opensubtitles.com/nl/subtitles/legacy/3956266
+                    related_links:
+                    - label: All subtitles for Major League
+                      url: https://www.opensubtitles.com/nl/movies/1989-major-league
+                      img_url: https://s9.osdb.link/features/5/0/1/518105.jpg
+                    files:
+                    - file_id: 544077
+                      cd_number: 1
+                      file_name: Major League WS DVDRip.srt
+                - id: "496423"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "496423"
+                    language: es
+                    download_count: 674
+                    new_download_count: 5
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 29.97
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2008-03-23T21:04:04.000Z
+                    release: Le mépris
+                    comments: ""
+                    legacy_subtitle_id: 3264195
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 518020
+                      feature_type: Movie
+                      year: 1963
+                      title: Contempt
+                      movie_name: 1963 - Contempt
+                      imdb_id: 57345
+                      tmdb_id: 266
+                    url: https://www.opensubtitles.com/es/subtitles/legacy/3264195
+                    related_links:
+                    - label: All subtitles for Contempt
+                      url: https://www.opensubtitles.com/es/movies/1963-contempt
+                      img_url: https://s9.osdb.link/features/0/2/0/518020.jpg
+                    files:
+                    - file_id: 6028018
+                      cd_number: 1
+                      file_name: Le mepris-es.srt
+                - id: "495449"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "495449"
+                    language: pt-BR
+                    download_count: 189
+                    new_download_count: 1
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 23.976
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2012-07-14T19:47:18.000Z
+                    release: Gnger Snaps
+                    comments: ""
+                    legacy_subtitle_id: 4617243
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 518342
+                      feature_type: Movie
+                      year: 2000
+                      title: Ginger Snaps
+                      movie_name: 2000 - Ginger Snaps
+                      imdb_id: 210070
+                      tmdb_id: 9871
+                    url: https://www.opensubtitles.com/pt-BR/subtitles/legacy/4617243
+                    related_links:
+                    - label: All subtitles for Ginger Snaps
+                      url: https://www.opensubtitles.com/pt-BR/movies/2000-ginger-snaps
+                      img_url: https://s9.osdb.link/features/2/4/3/518342.jpg
+                    files:
+                    - file_id: 546827
+                      cd_number: 1
+                      file_name: "Ginger Snaps [2000] DvDrip [Eng] Bugz.srt"
+                - id: "496964"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "496964"
+                    language: es
+                    download_count: 1190
+                    new_download_count: 7
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 23.976
+                    votes: 1
+                    points: 10
+                    ratings: 10
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2012-05-18T00:13:46.000Z
+                    release: 1963.El desprecio (subt)
+                    comments: ""
+                    legacy_subtitle_id: 4552383
+                    uploader:
+                      uploader_id: 63170
+                      name: robot2xl
+                      rank: read only
+                    feature_details:
+                      feature_id: 518020
+                      feature_type: Movie
+                      year: 1963
+                      title: Contempt
+                      movie_name: 1963 - Contempt
+                      imdb_id: 57345
+                      tmdb_id: 266
+                    url: https://www.opensubtitles.com/es/subtitles/legacy/4552383
+                    related_links:
+                    - label: All subtitles for Contempt
+                      url: https://www.opensubtitles.com/es/movies/1963-contempt
+                      img_url: https://s9.osdb.link/features/0/2/0/518020.jpg
+                    files:
+                    - file_id: 548446
+                      cd_number: 1
+                      file_name: 1963.El desprecio (subt).srt
+                - id: "492641"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "492641"
+                    language: es
+                    download_count: 1477
+                    new_download_count: 2
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 0
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2005-08-19T22:00:00.000Z
+                    release: "Philadelphia Story, The (1940)"
+                    comments: ""
+                    legacy_subtitle_id: 101000
+                    uploader:
+                      uploader_id: 14715
+                      name: marlowe62 (a)
+                      rank: bronze member
+                    feature_details:
+                      feature_id: 518136
+                      feature_type: Movie
+                      year: 1940
+                      title: The Philadelphia Story
+                      movie_name: 1940 - The Philadelphia Story
+                      imdb_id: 32904
+                      tmdb_id: 981
+                    url: https://www.opensubtitles.com/es/subtitles/legacy/101000
+                    related_links:
+                    - label: All subtitles for The Philadelphia Story
+                      url: https://www.opensubtitles.com/es/movies/1940-the-philadelphia-story
+                      img_url: https://s9.osdb.link/features/6/3/1/518136.jpg
+                    files:
+                    - file_id: 6026506
+                      cd_number: 1
+                      file_name: George Cukor - Historias de Filadelfia (1940) DvdRip
+                        XviD Mp3 Dual Divxclasico.Esp.srt
+                - id: "493247"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "493247"
+                    language: el
+                    download_count: 1052
+                    new_download_count: 16
+                    hearing_impaired: false
+                    hd: true
+                    format: ""
+                    fps: 23.976
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2011-05-17T07:28:54.000Z
+                    release: Superman.1978.720.BluRay.x264-VarK
+                    comments: ""
+                    legacy_subtitle_id: 4179141
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 517956
+                      feature_type: Movie
+                      year: 1978
+                      title: Superman
+                      movie_name: 1978 - Superman
+                      imdb_id: 78346
+                      tmdb_id: 1924
+                    url: https://www.opensubtitles.com/el/subtitles/legacy/4179141
+                    related_links:
+                    - label: All subtitles for Superman
+                      url: https://www.opensubtitles.com/el/movies/1978-superman
+                      img_url: https://s9.osdb.link/features/6/5/9/517956.jpg
+                    files:
+                    - file_id: 544327
+                      cd_number: 1
+                      file_name: Superman.1978.720.BluRay.x264-VarK.srt
+                - id: "496017"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "496017"
+                    language: en
+                    download_count: 24642
+                    new_download_count: 8
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 23.98
+                    votes: 13
+                    points: 81
+                    ratings: 6.2
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2002-10-10T22:00:00.000Z
+                    release: Jingle All the Way (1996)
+                    comments: none
+                    legacy_subtitle_id: 32268
+                    uploader:
+                      uploader_id: 6872
+                      name: alxmota (a)
+                      rank: bronze member
+                    feature_details:
+                      feature_id: 518213
+                      feature_type: Movie
+                      year: 1996
+                      title: Jingle All the Way
+                      movie_name: 1996 - Jingle All the Way
+                      imdb_id: 116705
+                      tmdb_id: 9279
+                    url: https://www.opensubtitles.com/en/subtitles/legacy/32268
+                    related_links:
+                    - label: All subtitles for Jingle All the Way
+                      url: https://www.opensubtitles.com/en/movies/1996-jingle-all-the-way
+                      img_url: https://s9.osdb.link/features/3/1/2/518213.jpg
+                    files:
+                    - file_id: 547446
+                      cd_number: 1
+                      file_name: ingles.srt
+                - id: "496396"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "496396"
+                    language: nl
+                    download_count: 1993
+                    new_download_count: 16
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 25
+                    votes: 1
+                    points: 7
+                    ratings: 7
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2013-10-10T22:54:26.000Z
+                    release: Come and See (Idi i smotri) (1985)
+                    comments: ""
+                    legacy_subtitle_id: 5217608
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 518417
+                      feature_type: Movie
+                      year: 1985
+                      title: Come and See
+                      movie_name: 1985 - Come and See
+                      imdb_id: 91251
+                      tmdb_id: 25237
+                    url: https://www.opensubtitles.com/nl/subtitles/legacy/5217608
+                    related_links:
+                    - label: All subtitles for Come and See
+                      url: https://www.opensubtitles.com/nl/movies/1985-come-and-see
+                      img_url: https://s9.osdb.link/features/7/1/4/518417.jpg
+                    files:
+                    - file_id: 547857
+                      cd_number: 1
+                      file_name: Come and See (Idi i smotri) (1985)-dut(1).srt
+                - id: "492427"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "492427"
+                    language: pt-BR
+                    download_count: 358
+                    new_download_count: 3
+                    hearing_impaired: false
+                    hd: true
+                    format: ""
+                    fps: 23.98
+                    votes: 1
+                    points: 1
+                    ratings: 1
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2015-12-26T15:19:56.000Z
+                    release: Rambo.First.Blood.II.1985.Ultimate.Uncut.Remastered.Edition.1080p.BluRay.x264.AAC-ETRG
+                    comments: PT-BR subtitle uploaded by saidleugim
+                    legacy_subtitle_id: 6437707
+                    uploader:
+                      uploader_id: 71162
+                      name: saidleugim
+                      rank: bronze member
+                    feature_details:
+                      feature_id: 517867
+                      feature_type: Movie
+                      year: 1985
+                      title: "Rambo: First Blood Part II"
+                      movie_name: "1985 - Rambo: First Blood Part II"
+                      imdb_id: 89880
+                      tmdb_id: 1369
+                    url: https://www.opensubtitles.com/pt-BR/subtitles/legacy/6437707
+                    related_links:
+                    - label: "All subtitles for Rambo: First Blood Part II"
+                      url: https://www.opensubtitles.com/pt-BR/movies/1985-rambo-first-blood-part-ii
+                      img_url: https://s9.osdb.link/features/7/6/8/517867.jpg
+                    files:
+                    - file_id: 6026410
+                      cd_number: 1
+                      file_name: Rambo.First.Blood.II.1985.Ultimate.Uncut.Remastered.Edition.1080p.BluRay.x264.AAC-ETRG.srt
+                - id: "493721"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "493721"
+                    language: en
+                    download_count: 16956
+                    new_download_count: 4
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 25
+                    votes: 7
+                    points: 67
+                    ratings: 9.6
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2007-05-16T09:07:38.000Z
+                    release: Hannibal
+                    comments: ""
+                    legacy_subtitle_id: 3123830
+                    uploader:
+                      uploader_id: 34153
+                      name: arkymedes
+                      rank: bronze member
+                    feature_details:
+                      feature_id: 517991
+                      feature_type: Movie
+                      year: 2001
+                      title: Hannibal
+                      movie_name: 2001 - Hannibal
+                      imdb_id: 212985
+                      tmdb_id: 9740
+                    url: https://www.opensubtitles.com/en/subtitles/legacy/3123830
+                    related_links:
+                    - label: All subtitles for Hannibal
+                      url: https://www.opensubtitles.com/en/movies/2001-hannibal
+                      img_url: https://s9.osdb.link/features/1/9/9/517991.jpg
+                    files:
+                    - file_id: 544852
+                      cd_number: 1
+                      file_name: Hannibal.en.srt
+                - id: "496722"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "496722"
+                    language: es
+                    download_count: 544
+                    new_download_count: 21
+                    hearing_impaired: false
+                    hd: true
+                    format: ""
+                    fps: 25
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: true
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2011-05-28T08:48:56.000Z
+                    release: Le Mepris (1963) HDRip Dual XviD Ac3 by FitoCorleone
+                    comments: "El.Desprecio.(Le.Mepris).(1963).HDRip.Dual.(Spa.Fr.).(Xvid+2Ac3).(proteinicos.es)...FitoCorleone.avi\
+                      \ [1.47 Gb]/ Corregidos por el GTC de DivXClasico para Proteinicos\
+                      \ y DXC"
+                    legacy_subtitle_id: 4184944
+                    uploader:
+                      uploader_id: 32127
+                      name: marlowe62
+                      rank: trusted
+                    feature_details:
+                      feature_id: 518020
+                      feature_type: Movie
+                      year: 1963
+                      title: Contempt
+                      movie_name: 1963 - Contempt
+                      imdb_id: 57345
+                      tmdb_id: 266
+                    url: https://www.opensubtitles.com/es/subtitles/legacy/4184944
+                    related_links:
+                    - label: All subtitles for Contempt
+                      url: https://www.opensubtitles.com/es/movies/1963-contempt
+                      img_url: https://s9.osdb.link/features/0/2/0/518020.jpg
+                    files:
+                    - file_id: 548202
+                      cd_number: 1
+                      file_name: Le Mepris (1963) HDRip Dual XviD Ac3 by FitoCorleone.Esp.srt
+                - id: "492688"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "492688"
+                    language: en
+                    download_count: 72506
+                    new_download_count: 62
+                    hearing_impaired: true
+                    hd: false
+                    format: ""
+                    fps: 25
+                    votes: 2
+                    points: 20
+                    ratings: 10
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2008-07-09T13:19:22.000Z
+                    release: "Rocky.I[1976]DvDrip-aXXo"
+                    comments: "Rocky-The.Complete.Saga[2007]DvDrip-aXXo"
+                    legacy_subtitle_id: 3302711
+                    uploader:
+                      uploader_id: 119465
+                      name: os_robot
+                      rank: bronze member
+                    feature_details:
+                      feature_id: 517932
+                      feature_type: Movie
+                      year: 1976
+                      title: Rocky
+                      movie_name: 1976 - Rocky
+                      imdb_id: 75148
+                      tmdb_id: 1366
+                    url: https://www.opensubtitles.com/en/subtitles/legacy/3302711
+                    related_links:
+                    - label: All subtitles for Rocky
+                      url: https://www.opensubtitles.com/en/movies/1976-rocky
+                      img_url: https://s9.osdb.link/features/2/3/9/517932.jpg
+                    files:
+                    - file_id: 543715
+                      cd_number: 1
+                      file_name: "Rocky.I[1976]DvDrip-aXXo.srt"
+                - id: "490625"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "490625"
+                    language: en
+                    download_count: 7989
+                    new_download_count: 20
+                    hearing_impaired: false
+                    hd: true
+                    format: ""
+                    fps: 0
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2013-07-06T11:07:28.000Z
+                    release: 9.Songs.2004.720p.BluRay.x264.anoXmous
+                    comments: ""
+                    legacy_subtitle_id: 5075303
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 518052
+                      feature_type: Movie
+                      year: 2004
+                      title: 9 Songs
+                      movie_name: 2004 - 9 Songs
+                      imdb_id: 411705
+                      tmdb_id: 27
+                    url: https://www.opensubtitles.com/en/subtitles/legacy/5075303
+                    related_links:
+                    - label: All subtitles for 9 Songs
+                      url: https://www.opensubtitles.com/en/movies/2004-9-songs
+                      img_url: https://s9.osdb.link/features/2/5/0/518052.jpg
+                    files:
+                    - file_id: 541296
+                      cd_number: 1
+                      file_name: 9.Songs.2004.720p.BluRay.x264.anoXmous_eng.srt
+                - id: "494835"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "494835"
+                    language: pt-BR
+                    download_count: 2028
+                    new_download_count: 10
+                    hearing_impaired: false
+                    hd: true
+                    format: ""
+                    fps: 24
+                    votes: 2
+                    points: 20
+                    ratings: 10
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2014-09-07T13:57:21.000Z
+                    release: Red Sonja.1985.BDRip.720p.MultiLang.MultiSub-Pitt
+                    comments: ""
+                    legacy_subtitle_id: 5815278
+                    uploader:
+                      uploader_id: 62530
+                      name: fjones1979
+                      rank: trusted
+                    feature_details:
+                      feature_id: 518067
+                      feature_type: Movie
+                      year: 1985
+                      title: Red Sonja
+                      movie_name: 1985 - Red Sonja
+                      imdb_id: 89893
+                      tmdb_id: 9626
+                    url: https://www.opensubtitles.com/pt-BR/subtitles/legacy/5815278
+                    related_links:
+                    - label: All subtitles for Red Sonja
+                      url: https://www.opensubtitles.com/pt-BR/movies/1985-red-sonja
+                      img_url: https://s9.osdb.link/features/7/6/0/518067.jpg
+                    files:
+                    - file_id: 546129
+                      cd_number: 1
+                      file_name: Red Sonja.1985.BDRip.720p.MultiLang.MultiSub-Pitt.por.srt
+                - id: "492618"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "492618"
+                    language: pl
+                    download_count: 147
+                    new_download_count: 4
+                    hearing_impaired: false
+                    hd: true
+                    format: ""
+                    fps: 0
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2015-07-08T20:47:42.000Z
+                    release: Presumed.Innocent.1990.720p.BRRip.XviD.AC3-RARBG
+                    comments: ""
+                    legacy_subtitle_id: 6228423
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 517957
+                      feature_type: Movie
+                      year: 1990
+                      title: Presumed Innocent
+                      movie_name: 1990 - Presumed Innocent
+                      imdb_id: 100404
+                      tmdb_id: 11092
+                    url: https://www.opensubtitles.com/pl/subtitles/legacy/6228423
+                    related_links:
+                    - label: All subtitles for Presumed Innocent
+                      url: https://www.opensubtitles.com/pl/movies/1990-presumed-innocent
+                      img_url: https://s9.osdb.link/features/7/5/9/517957.jpg
+                    files:
+                    - file_id: 6026497
+                      cd_number: 1
+                      file_name: Presumed.Innocent.1990.720p.BRRip.XviD.AC3-RARBG.txt
+                - id: "496727"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "496727"
+                    language: en
+                    download_count: 1912
+                    new_download_count: 63
+                    hearing_impaired: false
+                    hd: true
+                    format: ""
+                    fps: 23.976
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2016-08-12T06:53:45.000Z
+                    release: Idi.i.smotri.AKA.Come.and.See.1985.IVC.1080p.BluRay.Remux.AVC.FLAC.2.0-oddset
+                    comments: ""
+                    legacy_subtitle_id: 6708061
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 518417
+                      feature_type: Movie
+                      year: 1985
+                      title: Come and See
+                      movie_name: 1985 - Come and See
+                      imdb_id: 91251
+                      tmdb_id: 25237
+                    url: https://www.opensubtitles.com/en/subtitles/legacy/6708061
+                    related_links:
+                    - label: All subtitles for Come and See
+                      url: https://www.opensubtitles.com/en/movies/1985-come-and-see
+                      img_url: https://s9.osdb.link/features/7/1/4/518417.jpg
+                    files:
+                    - file_id: 6028156
+                      cd_number: 1
+                      file_name: Idi.i.smotri.AKA.Come.and.See.1985.IVC.1080p.BluRay.Remux.AVC.FLAC.2.0-oddset.srt
+                - id: "493563"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "493563"
+                    language: en
+                    download_count: 14796
+                    new_download_count: 12
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 23.976
+                    votes: 1
+                    points: 10
+                    ratings: 10
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2001-12-04T23:00:00.000Z
+                    release: The Secret Garden
+                    comments: ""
+                    legacy_subtitle_id: 106540
+                    uploader:
+                      uploader_id: 4143
+                      name: Panayot (a)
+                      rank: bronze member
+                    feature_details:
+                      feature_id: 518028
+                      feature_type: Movie
+                      year: 1993
+                      title: The Secret Garden
+                      movie_name: 1993 - The Secret Garden
+                      imdb_id: 108071
+                      tmdb_id: 11236
+                    url: https://www.opensubtitles.com/en/subtitles/legacy/106540
+                    related_links:
+                    - label: All subtitles for The Secret Garden
+                      url: https://www.opensubtitles.com/en/movies/1993-the-secret-garden
+                      img_url: https://s9.osdb.link/features/8/2/0/518028.jpg
+                    files:
+                    - file_id: 544691
+                      cd_number: 1
+                      file_name: TheSecretGarden_EN.sub
+                - id: "492466"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "492466"
+                    language: he
+                    download_count: 128
+                    new_download_count: 1
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 0
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2008-02-08T02:00:42.000Z
+                    release: Rocky.1976.DVDRip.XviD.AC3.iNTERNAL-QiM
+                    comments: ""
+                    legacy_subtitle_id: 3246129
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 517932
+                      feature_type: Movie
+                      year: 1976
+                      title: Rocky
+                      movie_name: 1976 - Rocky
+                      imdb_id: 75148
+                      tmdb_id: 1366
+                    url: https://www.opensubtitles.com/he/subtitles/legacy/3246129
+                    related_links:
+                    - label: All subtitles for Rocky
+                      url: https://www.opensubtitles.com/he/movies/1976-rocky
+                      img_url: https://s9.osdb.link/features/2/3/9/517932.jpg
+                    files:
+                    - file_id: 6026439
+                      cd_number: 2
+                      file_name: qim-rockyb.srt
+                    - file_id: 6026437
+                      cd_number: 1
+                      file_name: qim-rockya.srt
+                - id: "492560"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "492560"
+                    language: pt-BR
+                    download_count: 64
+                    new_download_count: 2
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 0
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2017-07-29T22:49:40.000Z
+                    release: jornada
+                    comments: ""
+                    legacy_subtitle_id: 7052825
+                    uploader:
+                      uploader_id: 3282
+                      name: COF7CJpS
+                      rank: app developer
+                    feature_details:
+                      feature_id: 517867
+                      feature_type: Movie
+                      year: 1985
+                      title: "Rambo: First Blood Part II"
+                      movie_name: "1985 - Rambo: First Blood Part II"
+                      imdb_id: 89880
+                      tmdb_id: 1369
+                    url: https://www.opensubtitles.com/pt-BR/subtitles/legacy/7052825
+                    related_links:
+                    - label: "All subtitles for Rambo: First Blood Part II"
+                      url: https://www.opensubtitles.com/pt-BR/movies/1985-rambo-first-blood-part-ii
+                      img_url: https://s9.osdb.link/features/7/6/8/517867.jpg
+                    files:
+                    - file_id: 6026472
+                      cd_number: 1
+                      file_name: jornada.srt
+                - id: "496159"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "496159"
+                    language: de
+                    download_count: 226
+                    new_download_count: 7
+                    hearing_impaired: false
+                    hd: false
+                    format: ""
+                    fps: 25
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: true
+                    foreign_parts_only: false
+                    ai_translated: false
+                    machine_translated: false
+                    upload_date: 2012-07-21T17:11:45.000Z
+                    release: Komm.und.sieh.1985.German.DVDRip.Retail
+                    comments: RUSCICO / Russian Cinema Council
+                    legacy_subtitle_id: 4622375
+                    uploader:
+                      uploader_id: 41812
+                      name: Ralle1
+                      rank: administrator
+                    feature_details:
+                      feature_id: 518417
+                      feature_type: Movie
+                      year: 1985
+                      title: Come and See
+                      movie_name: 1985 - Come and See
+                      imdb_id: 91251
+                      tmdb_id: 25237
+                    url: https://www.opensubtitles.com/de/subtitles/legacy/4622375
+                    related_links:
+                    - label: All subtitles for Come and See
+                      url: https://www.opensubtitles.com/de/movies/1985-come-and-see
+                      img_url: https://s9.osdb.link/features/7/1/4/518417.jpg
+                    files:
+                    - file_id: 6027938
+                      cd_number: 2
+                      file_name: Komm.und.sieh.1985.German.DVDRip.CD2.Retail.srt
+                    - file_id: 6027936
+                      cd_number: 1
+                      file_name: Komm.und.sieh.1985.German.DVDRip.CD1.Retail.srt
+              schema:
+                $ref: '#/components/schemas/most_downloaded_200_response'
+            example:
+              example:
+                total_pages: 1
+                total_count: 60
+                page: 1
+                data:
+                - id: "766099"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "766099"
+                    language: ko
+                    download_count: 2836
+                    new_download_count: 190
+                    hearing_impaired: false
+                    hd: true
+                    fps: 23.976
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    upload_date: 2016-08-24T17:25:17.000Z
+                    release: The.Twilight.Saga.Breaking.Dawn.Part 1.2011.720p.BrRip.x264.YIFY
+                    comments: ""
+                    legacy_subtitle_id: 6717006
+                    uploader:
+                      uploader_id: 3282
+                      name: os-auto
+                      rank: Application Developers
+                    feature_details:
+                      feature_id: 568028
+                      feature_type: Movie
+                      year: 2011
+                      title: "The Twilight Saga: Breaking Dawn - Part 1"
+                      movie_name: "2011 - The Twilight Saga: Breaking Dawn - Part\
+                        \ 1"
+                      imdb_id: 1324999
+                      tmdb_id: 50619
+                    url: https://www.opensubtitles.com/ko/subtitles/legacy/6717006
+                    related_links:
+                      label: "All subtitles for The Twilight Saga: Breaking Dawn -\
+                        \ Part 1"
+                      url: https://www.opensubtitles.com/ko/movies/2011-the-twilight-saga-breaking-dawn-part-1
+                      img_url: https://s9.osdb.link/features/8/2/0/568028.jpg
+                    files:
+                    - file_id: 841356
+                      cd_number: 1
+                      file_name: The.Twilight.Saga.Breaking.Dawn.Part 1.2011.720p.BrRip.x264.YIFY.smi
+                - id: "4885905"
+                  type: subtitle
+                  attributes:
+                    subtitle_id: "4885905"
+                    language: ko
+                    download_count: 3838
+                    new_download_count: 78
+                    hearing_impaired: false
+                    hd: true
+                    fps: 23.976
+                    votes: 0
+                    points: 0
+                    ratings: 0
+                    from_trusted: false
+                    foreign_parts_only: false
+                    ai_translated: false
+                    upload_date: 2019-07-28T19:18:09.000Z
+                    release: The.Wolf.of.Wall.Street.2013.1080p.BluRay.x264-AMIABLE
+                    comments: ksub
+                    legacy_subtitle_id: 7845982
+                    uploader:
+                      uploader_id: 82010
+                      name: ksubscene
+                      rank: Gold member
+                    feature_details:
+                      feature_id: 586864
+                      feature_type: Movie
+                      year: 2013
+                      title: The Wolf of Wall Street
+                      movie_name: 2013 - The Wolf of Wall Street
+                      imdb_id: 993846
+                      tmdb_id: 106646
+                    url: https://www.opensubtitles.com/ko/subtitles/legacy/7845982
+                    related_links:
+                      label: All subtitles for The Wolf of Wall Street
+                      url: https://www.opensubtitles.com/ko/movies/2013-the-wolf-of-wall-street
+                      img_url: https://s9.osdb.link/features/4/6/8/586864.jpg
+                    files:
+                    - file_id: 5009225
+                      cd_number: 1
+                      file_name: The.Wolf.of.Wall.Street.2013.1080p.BluRay.x264-AMIABLE.smi
+          description: 'Lists most downloaded movie subtitles '
+      security:
+      - Api-Key: []
+      summary: Most downloaded subtitles
+      tags:
+      - Discover
+      x-accepts: application/json
+  /features:
+    get:
+      deprecated: false
+      description: |-
+        With the "query" parameter, search for a Feature from a simple text input. Typically used for a text search or autocomplete.
+
+        With an ID, get basic information and subtitles count for a specific title.
+
+        <!-- theme: warning -->
+
+        > ### Watch Out!
+        >
+        > If you create an autocomplete, don't set a too small refresh limit, remember you must not go over 40 requests per 10 seconds!
+      operationId: features
+      parameters:
+      - description: "query to search, release/file name accepted"
+        explode: true
+        in: query
+        name: query
+        required: false
+        schema:
+          minLength: 3
+          type: string
+        style: form
+      - description: "empty to list all or **movie**, **tvshow** or **episode**."
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: opensubtitles **feature_id**
+        explode: true
+        in: query
+        name: feature_id
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: "IMDB ID, delete leading zeroes"
+        explode: true
+        in: query
+        name: imdb_id
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: TheMovieDB ID - combine with type to avoid errors
+        explode: true
+        in: query
+        name: tmdb_id
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by year. Can only be used in combination with a query
+        explode: true
+        in: query
+        name: year
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                data:
+                - id: "9803"
+                  type: feature
+                  attributes:
+                    title: Waking the Dead
+                    original_title: ""
+                    year: "2000"
+                    subtitles_counts:
+                      en: 68
+                      es: 41
+                      nl: 40
+                      ro: 40
+                      ru: 30
+                      sr: 21
+                      pl: 7
+                      pt-BR: 4
+                      hr: 3
+                      pt-PT: 3
+                      bg: 2
+                      el: 2
+                      he: 2
+                      fa: 2
+                      sl: 2
+                      tr: 2
+                      ar: 1
+                      bs: 1
+                      cs: 1
+                      et: 1
+                      fi: 1
+                      fr: 1
+                      hu: 1
+                      id: 1
+                      ja: 1
+                      sk: 1
+                      th: 1
+                      vi: 1
+                    subtitles_count: 11
+                    seasons_count: 9
+                    parent_title: ""
+                    season_number: 0
+                    episode_number: ""
+                    imdb_id: 259733
+                    tmdb_id: 4860
+                    parent_imdb_id: ""
+                    feature_id: "9803"
+                    title_aka:
+                    - Waking the Dead
+                    - ' Waking the Dead – Im Auftrag der Toten'
+                    feature_type: Tvshow
+                    url: https://www.opensubtitles.com/en/tvshows/2000-waking-the-dead
+                    img_url: https://s9.osdb.link/features/3/0/8/9803.jpg
+                    seasons:
+                    - season_number: 1
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" Pilot: Part 1"
+                        feature_id: 126854
+                        feature_imdb_id: 743365
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" Pilot: Part 2"
+                        feature_id: 126863
+                        feature_imdb_id: 936019
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" Burn Out: Part 1"
+                        feature_id: 126861
+                        feature_imdb_id: 743355
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" Burn Out: Part 2"
+                        feature_id: 126858
+                        feature_imdb_id: 936016
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" Blind Beggar: Part 1"
+                        feature_id: 126862
+                        feature_imdb_id: 743353
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" Blind Beggar: Part 2"
+                        feature_id: 126859
+                        feature_imdb_id: 936017
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" A Simple Sacrifice: Part 1"
+                        feature_id: 126860
+                        feature_imdb_id: 743350
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" A Simple Sacrifice: Part 2"
+                        feature_id: 126864
+                        feature_imdb_id: 936015
+                      - episode_number: 9
+                        title: "\"Waking the Dead\" Every Breath You Take: Part 1"
+                        feature_id: 126865
+                        feature_imdb_id: 743358
+                      - episode_number: 10
+                        title: "\"Waking the Dead\" Every Breath You Take: Part 2"
+                        feature_id: 126869
+                        feature_imdb_id: 936018
+                    - season_number: 2
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" Life Sentence: Part 1"
+                        feature_id: 126868
+                        feature_imdb_id: 743363
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" Life Sentence: Part 2"
+                        feature_id: 126871
+                        feature_imdb_id: 1108804
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" Deathwatch: Part 1"
+                        feature_id: 126867
+                        feature_imdb_id: 743357
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" Deathwatch: Part 2"
+                        feature_id: 126870
+                        feature_imdb_id: 1108805
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" Special Relationship: Part 1"
+                        feature_id: 126872
+                        feature_imdb_id: 743367
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" Special Relationship: Part 2"
+                        feature_id: 126878
+                        feature_imdb_id: 1091606
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" Thin Air: Part 1"
+                        feature_id: 126875
+                        feature_imdb_id: 743371
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" Thin Air: Part 2"
+                        feature_id: 126877
+                        feature_imdb_id: 1167299
+                    - season_number: 3
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" Multistorey: Part 1"
+                        feature_id: 126876
+                        feature_imdb_id: 743364
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" Multistorey: Part 2"
+                        feature_id: 126883
+                        feature_imdb_id: 1167294
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" Walking on Water: Part 1"
+                        feature_id: 126884
+                        feature_imdb_id: 743374
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" Walking on Water: Part 2"
+                        feature_id: 126879
+                        feature_imdb_id: 1167302
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" Breaking Glass: Part 1"
+                        feature_id: 126885
+                        feature_imdb_id: 743354
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" Breaking Glass: Part 2"
+                        feature_id: 126881
+                        feature_imdb_id: 1167289
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" Final Cut: Part 1"
+                        feature_id: 126887
+                        feature_imdb_id: 743360
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" Final Cut: Part 2"
+                        feature_id: 126882
+                        feature_imdb_id: 1167292
+                    - season_number: 4
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" In Sight of the Lord: Part 1"
+                        feature_id: 126888
+                        feature_imdb_id: 743362
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" In Sight of the Lord: Part 2"
+                        feature_id: 126866
+                        feature_imdb_id: 1103924
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" False Flag: Part 1"
+                        feature_id: 126852
+                        feature_imdb_id: 743359
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" False Flag: Part 2"
+                        feature_id: 126857
+                        feature_imdb_id: 1167291
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" Fugue States: Part 1"
+                        feature_id: 126880
+                        feature_imdb_id: 743361
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" Fugue States: Part 2"
+                        feature_id: 126886
+                        feature_imdb_id: 1167293
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" Anger Management: Part 1"
+                        feature_id: 126889
+                        feature_imdb_id: 743351
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" Anger Management: Part 2"
+                        feature_id: 126874
+                        feature_imdb_id: 1167287
+                      - episode_number: 9
+                        title: "\"Waking the Dead\" The Hardest Word: Part 1"
+                        feature_id: 126891
+                        feature_imdb_id: 743370
+                      - episode_number: 10
+                        title: "\"Waking the Dead\" The Hardest Word: Part 2"
+                        feature_id: 126890
+                        feature_imdb_id: 1167298
+                      - episode_number: 11
+                        title: "\"Waking the Dead\" Shadowplay: Part 1"
+                        feature_id: 126893
+                        feature_imdb_id: 743366
+                      - episode_number: 12
+                        title: "\"Waking the Dead\" Shadowplay: Part 2"
+                        feature_id: 126892
+                        feature_imdb_id: 1167295
+                    - season_number: 5
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" Towers of Silence: Part 1"
+                        feature_id: 126810
+                        feature_imdb_id: 743372
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" Towers of Silence: Part 2"
+                        feature_id: 126811
+                        feature_imdb_id: 1167300
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" Black Run: Part 1"
+                        feature_id: 126814
+                        feature_imdb_id: 743352
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" Black Run: Part 2"
+                        feature_id: 126808
+                        feature_imdb_id: 1167288
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" Subterraneans: Part 1"
+                        feature_id: 126816
+                        feature_imdb_id: 743369
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" Subterraneans: Part 2"
+                        feature_id: 126818
+                        feature_imdb_id: 1167297
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" Straw Dog: Part 1"
+                        feature_id: 126820
+                        feature_imdb_id: 743368
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" Straw Dog: Part 2"
+                        feature_id: 126822
+                        feature_imdb_id: 1167296
+                      - episode_number: 9
+                        title: "\"Waking the Dead\" Undertow: Part 1"
+                        feature_id: 126819
+                        feature_imdb_id: 743373
+                      - episode_number: 10
+                        title: "\"Waking the Dead\" Undertow: Part 2"
+                        feature_id: 126821
+                        feature_imdb_id: 1167301
+                      - episode_number: 11
+                        title: "\"Waking the Dead\" Cold Fusion: Part 1"
+                        feature_id: 126823
+                        feature_imdb_id: 743356
+                      - episode_number: 12
+                        title: "\"Waking the Dead\" Cold Fusion: Part 2"
+                        feature_id: 126817
+                        feature_imdb_id: 1167290
+                    - season_number: 6
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" Wren Boys: Part 1"
+                        feature_id: 126895
+                        feature_imdb_id: 930851
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" Wren Boys: Part 2"
+                        feature_id: 126855
+                        feature_imdb_id: 932475
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" Deus Ex Machina: Part 1"
+                        feature_id: 126894
+                        feature_imdb_id: 932472
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" Deus Ex Machina: Part 2"
+                        feature_id: 126896
+                        feature_imdb_id: 932473
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" The Fall: Part 1"
+                        feature_id: 126898
+                        feature_imdb_id: 875569
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" The Fall: Part 2"
+                        feature_id: 126873
+                        feature_imdb_id: 938259
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" Mask of Sanity: Part 1"
+                        feature_id: 126899
+                        feature_imdb_id: 952542
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" Mask of Sanity: Part 2"
+                        feature_id: 126902
+                        feature_imdb_id: 952543
+                      - episode_number: 9
+                        title: "\"Waking the Dead\" Double Bind: Part 1"
+                        feature_id: 126897
+                        feature_imdb_id: 952540
+                      - episode_number: 10
+                        title: "\"Waking the Dead\" Double Bind: Part 2"
+                        feature_id: 126903
+                        feature_imdb_id: 952541
+                      - episode_number: 11
+                        title: "\"Waking the Dead\" Yahrzeit: Part 1"
+                        feature_id: 126901
+                        feature_imdb_id: 892727
+                      - episode_number: 12
+                        title: "\"Waking the Dead\" Yahrzeit: Part 2"
+                        feature_id: 126900
+                        feature_imdb_id: 942279
+                    - season_number: 7
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" Missing Persons: Part 1"
+                        feature_id: 126825
+                        feature_imdb_id: 1215441
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" Missing Persons: Part 2"
+                        feature_id: 126824
+                        feature_imdb_id: 1215442
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" Sins: Part 1"
+                        feature_id: 126815
+                        feature_imdb_id: 1218284
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" Sins: Part 2"
+                        feature_id: 126826
+                        feature_imdb_id: 1218285
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" Duty and Honour: Part 1"
+                        feature_id: 126828
+                        feature_imdb_id: 1221781
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" Duty and Honour: Part 2"
+                        feature_id: 126830
+                        feature_imdb_id: 1221782
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" Skin: Part 1"
+                        feature_id: 126829
+                        feature_imdb_id: 1225236
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" Skin: Part 2"
+                        feature_id: 126831
+                        feature_imdb_id: 1225237
+                      - episode_number: 9
+                        title: "\"Waking the Dead\" Wounds: Part 1"
+                        feature_id: 126827
+                        feature_imdb_id: 1227115
+                      - episode_number: 10
+                        title: "\"Waking the Dead\" Wounds: Part 2"
+                        feature_id: 126834
+                        feature_imdb_id: 1227116
+                      - episode_number: 11
+                        title: "\"Waking the Dead\" Pieta: Part 1"
+                        feature_id: 126833
+                        feature_imdb_id: 1231221
+                      - episode_number: 12
+                        title: "\"Waking the Dead\" Pietà: Part 2"
+                        feature_id: 126832
+                        feature_imdb_id: 1231222
+                    - season_number: 8
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" Magdalene 26: Part 1"
+                        feature_id: 126836
+                        feature_imdb_id: 1506431
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" Magdalene 26: Part 2"
+                        feature_id: 126839
+                        feature_imdb_id: 1506432
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" End of the Night: Part 1"
+                        feature_id: 126837
+                        feature_imdb_id: 1509622
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" End of the Night: Part 2"
+                        feature_id: 126838
+                        feature_imdb_id: 1509623
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" Substitute: Part 1"
+                        feature_id: 126840
+                        feature_imdb_id: 1513669
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" Substitute: Part 2"
+                        feature_id: 126842
+                        feature_imdb_id: 1514406
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" End Game: Part 1"
+                        feature_id: 126846
+                        feature_imdb_id: 1519231
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" End Game: Part 2"
+                        feature_id: 126843
+                        feature_imdb_id: 1519232
+                    - season_number: 9
+                      episodes:
+                      - episode_number: 1
+                        title: "\"Waking the Dead\" Harbinger: Part 1"
+                        feature_id: 126856
+                        feature_imdb_id: 1862440
+                      - episode_number: 2
+                        title: "\"Waking the Dead\" Harbinger: Part 2"
+                        feature_id: 126853
+                        feature_imdb_id: 1862441
+                      - episode_number: 3
+                        title: "\"Waking the Dead\" Care: Part 1"
+                        feature_id: 126844
+                        feature_imdb_id: 1865234
+                      - episode_number: 4
+                        title: "\"Waking the Dead\" Care: Part 2"
+                        feature_id: 126845
+                        feature_imdb_id: 1865235
+                      - episode_number: 5
+                        title: "\"Waking the Dead\" Solidarity: Part 1"
+                        feature_id: 126849
+                        feature_imdb_id: 1869183
+                      - episode_number: 6
+                        title: "\"Waking the Dead\" Solidarity: Part 2"
+                        feature_id: 126851
+                        feature_imdb_id: 1869184
+                      - episode_number: 7
+                        title: "\"Waking the Dead\" Conviction: Part 1"
+                        feature_id: 126848
+                        feature_imdb_id: 1877523
+                      - episode_number: 8
+                        title: "\"Waking the Dead\" Conviction: Part 2"
+                        feature_id: 126841
+                        feature_imdb_id: 1877524
+                      - episode_number: 9
+                        title: "\"Waking the Dead\" Waterloo, Part 1"
+                        feature_id: 126850
+                        feature_imdb_id: 1886367
+                      - episode_number: 10
+                        title: "\"Waking the Dead\" Waterloo, Part 2"
+                        feature_id: 126847
+                        feature_imdb_id: 1886368
+                - id: "126842"
+                  type: feature
+                  attributes:
+                    title: "\"Waking the Dead\" Substitute: Part 2"
+                    original_title: ""
+                    year: "2009"
+                    subtitles_counts:
+                      nl: 1
+                      en: 1
+                      sr: 1
+                      es: 1
+                    subtitles_count: 4
+                    seasons_count: 0
+                    parent_title: Waking the Dead
+                    season_number: 8
+                    episode_number: 6
+                    imdb_id: 1514406
+                    tmdb_id: ""
+                    parent_imdb_id: 259733
+                    feature_id: "126842"
+                    title_aka:
+                    - "\"Waking the Dead\" Substitute: Part 2"
+                    feature_type: Episode
+                    url: https://www.opensubtitles.com/en/tvshows/2000-waking-the-dead/seasons/8/episodes/6-waking-the-dead-substitute-part-2
+                    img_url: https://s9.osdb.link/features/2/4/8/126842.jpg
+                    seasons: []
+                - id: "126810"
+                  type: feature
+                  attributes:
+                    title: "\"Waking the Dead\" Towers of Silence: Part 1"
+                    original_title: ""
+                    year: "2005"
+                    subtitles_counts:
+                      es: 10
+                      en: 4
+                      pl: 3
+                      pt-PT: 3
+                      bg: 2
+                      he: 2
+                      fa: 2
+                      ru: 2
+                      sr: 2
+                      tr: 2
+                      ro: 2
+                      pt-BR: 2
+                      ar: 1
+                      bs: 1
+                      cs: 1
+                      nl: 1
+                      et: 1
+                      fi: 1
+                      fr: 1
+                      el: 1
+                      hr: 1
+                      hu: 1
+                      id: 1
+                      ja: 1
+                      sk: 1
+                      sl: 1
+                      th: 1
+                      vi: 1
+                    subtitles_count: 52
+                    seasons_count: 0
+                    parent_title: Waking the Dead
+                    season_number: 5
+                    episode_number: 1
+                    imdb_id: 743372
+                    tmdb_id: ""
+                    parent_imdb_id: 259733
+                    feature_id: "126810"
+                    title_aka:
+                    - "\"Waking the Dead\" Towers of Silence: Part 1"
+                    feature_type: Episode
+                    url: https://www.opensubtitles.com/en/tvshows/2000-waking-the-dead/seasons/5/episodes/1-waking-the-dead-towers-of-silence-part-1
+                    img_url: https://s9.osdb.link/features/0/1/8/126810.jpg
+                    seasons: []
+                - id: "646786"
+                  type: feature
+                  attributes:
+                    title: Waking the Dead
+                    original_title: Waking the Dead
+                    year: "2000"
+                    subtitles_counts:
+                      en: 68
+                      es: 41
+                      nl: 40
+                      ro: 40
+                      ru: 30
+                      sr: 21
+                      pl: 7
+                      pt-BR: 4
+                      hr: 3
+                      pt-PT: 3
+                      bg: 2
+                      el: 2
+                      he: 2
+                      fa: 2
+                      sl: 2
+                      tr: 2
+                      ar: 1
+                      bs: 1
+                      cs: 1
+                      et: 1
+                      fi: 1
+                      fr: 1
+                      hu: 1
+                      id: 1
+                      ja: 1
+                      sk: 1
+                      th: 1
+                      vi: 1
+                    subtitles_count: 25
+                    seasons_count: 0
+                    parent_title: ""
+                    season_number: 0
+                    episode_number: ""
+                    imdb_id: 127349
+                    tmdb_id: 37722
+                    parent_imdb_id: ""
+                    feature_id: "646786"
+                    title_aka:
+                    - Waking the Dead
+                    - ' Resucitar un amor'
+                    - ' Le Fantôme de Sarah Williams'
+                    - ' Szerelmem szelleme'
+                    - ' Amor Maior que a Vida'
+                    - ' Пробуждая мертвецов'
+                    - ' 死亡中惊醒'
+                    feature_type: Movie
+                    url: https://www.opensubtitles.com/en/movies/2000-waking-the-dead-5559
+                    img_url: https://s9.osdb.link/features/6/8/7/646786.jpg
+                    seasons: []
+                - id: "126847"
+                  type: feature
+                  attributes:
+                    title: "\"Waking the Dead\" Waterloo, Part 2"
+                    original_title: ""
+                    year: "2011"
+                    subtitles_counts:
+                      nl: 1
+                      en: 1
+                      sr: 1
+                      ro: 1
+                    subtitles_count: 4
+                    seasons_count: 0
+                    parent_title: Waking the Dead
+                    season_number: 9
+                    episode_number: 10
+                    imdb_id: 1886368
+                    tmdb_id: ""
+                    parent_imdb_id: 259733
+                    feature_id: "126847"
+                    title_aka:
+                    - '"Waking the Dead" Waterloo'
+                    - ' Part 2'
+                    feature_type: Episode
+                    url: https://www.opensubtitles.com/en/tvshows/2000-waking-the-dead/seasons/9/episodes/10-waking-the-dead-waterloo-part-2
+                    img_url: ""
+                    seasons: []
+                - id: "126857"
+                  type: feature
+                  attributes:
+                    title: "\"Waking the Dead\" False Flag: Part 2"
+                    original_title: ""
+                    year: "2004"
+                    subtitles_counts:
+                      ru: 2
+                      ro: 2
+                      en: 1
+                    subtitles_count: 5
+                    seasons_count: 0
+                    parent_title: Waking the Dead
+                    season_number: 4
+                    episode_number: 4
+                    imdb_id: 1167291
+                    tmdb_id: ""
+                    parent_imdb_id: 259733
+                    feature_id: "126857"
+                    title_aka:
+                    - "\"Waking the Dead\" False Flag: Part 2"
+                    feature_type: Episode
+                    url: https://www.opensubtitles.com/en/tvshows/2000-waking-the-dead/seasons/4/episodes/4-waking-the-dead-false-flag-part-2
+                    img_url: https://s9.osdb.link/features/7/5/8/126857.jpg
+                    seasons: []
+                - id: "62212"
+                  type: feature
+                  attributes:
+                    title: '"Point Pleasant" Waking the Dead'
+                    original_title: ""
+                    year: "2005"
+                    subtitles_counts:
+                      pl: 3
+                      en: 2
+                      hu: 2
+                      cs: 1
+                      nl: 1
+                      et: 1
+                      fi: 1
+                      fr: 1
+                      el: 1
+                      pt-PT: 1
+                      ro: 1
+                      pt-BR: 1
+                    subtitles_count: 16
+                    seasons_count: 0
+                    parent_title: Point Pleasant
+                    season_number: 1
+                    episode_number: 9
+                    imdb_id: 676101
+                    tmdb_id: ""
+                    parent_imdb_id: 435576
+                    feature_id: "62212"
+                    title_aka:
+                    - '"Point Pleasant" Waking the Dead'
+                    feature_type: Episode
+                    url: https://www.opensubtitles.com/en/tvshows/2005-point-pleasant/seasons/1/episodes/9-point-pleasant-waking-the-dead
+                    img_url: https://s9.osdb.link/features/2/1/2/62212.jpg
+                    seasons: []
+                - id: "126869"
+                  type: feature
+                  attributes:
+                    title: "\"Waking the Dead\" Every Breath You Take: Part 2"
+                    original_title: ""
+                    year: "2001"
+                    subtitles_counts:
+                      en: 1
+                      es: 1
+                      ro: 1
+                    subtitles_count: 3
+                    seasons_count: 0
+                    parent_title: Waking the Dead
+                    season_number: 1
+                    episode_number: 10
+                    imdb_id: 936018
+                    tmdb_id: ""
+                    parent_imdb_id: 259733
+                    feature_id: "126869"
+                    title_aka:
+                    - "\"Waking the Dead\" Every Breath You Take: Part 2"
+                    feature_type: Episode
+                    url: https://www.opensubtitles.com/en/tvshows/2000-waking-the-dead/seasons/1/episodes/10-waking-the-dead-every-breath-you-take-part-2
+                    img_url: ""
+                    seasons: []
+                - id: "126826"
+                  type: feature
+                  attributes:
+                    title: "\"Waking the Dead\" Sins: Part 2"
+                    original_title: ""
+                    year: "2008"
+                    subtitles_counts:
+                      ru: 2
+                      nl: 1
+                      en: 1
+                    subtitles_count: 4
+                    seasons_count: 0
+                    parent_title: Waking the Dead
+                    season_number: 7
+                    episode_number: 4
+                    imdb_id: 1218285
+                    tmdb_id: ""
+                    parent_imdb_id: 259733
+                    feature_id: "126826"
+                    title_aka:
+                    - "\"Waking the Dead\" Sins: Part 2"
+                    feature_type: Episode
+                    url: https://www.opensubtitles.com/en/tvshows/2000-waking-the-dead/seasons/7/episodes/4-waking-the-dead-sins-part-2
+                    img_url: ""
+                    seasons: []
+                - id: "126837"
+                  type: feature
+                  attributes:
+                    title: "\"Waking the Dead\" End of the Night: Part 1"
+                    original_title: ""
+                    year: "2009"
+                    subtitles_counts:
+                      nl: 2
+                      en: 1
+                      sr: 1
+                      es: 1
+                    subtitles_count: 5
+                    seasons_count: 0
+                    parent_title: Waking the Dead
+                    season_number: 8
+                    episode_number: 3
+                    imdb_id: 1509622
+                    tmdb_id: ""
+                    parent_imdb_id: 259733
+                    feature_id: "126837"
+                    title_aka:
+                    - "\"Waking the Dead\" End of the Night: Part 1"
+                    feature_type: Episode
+                    url: https://www.opensubtitles.com/en/tvshows/2000-waking-the-dead/seasons/8/episodes/3-waking-the-dead-end-of-the-night-part-1
+                    img_url: https://s9.osdb.link/features/7/3/8/126837.jpg
+                    seasons: []
+                value: this is test  how it is rendered
+              schema:
+                $ref: '#/components/schemas/features_200_response'
+            example:
+              example:
+                value:
+                  data:
+                  - id: "646193"
+                    type: feature
+                    attributes:
+                      title: The Matrix
+                      original_title: The Matrix
+                      year: "1999"
+                      subtitles_counts:
+                        pl: 151
+                        en: 120
+                        tr: 68
+                        ro: 57
+                        es: 55
+                        cs: 54
+                        pt-BR: 49
+                        sl: 41
+                        pt-PT: 39
+                        sr: 39
+                        el: 38
+                        he: 31
+                        bg: 30
+                        nl: 24
+                        fr: 20
+                        fi: 19
+                        hu: 17
+                        ar: 16
+                        ru: 15
+                        hr: 14
+                        da: 13
+                        et: 11
+                        sv: 11
+                        sq: 10
+                        de: 8
+                        bs: 7
+                        it: 7
+                        ko: 7
+                        "no": 7
+                        fa: 7
+                        sk: 7
+                        zh-CN: 6
+                        mk: 6
+                        ms: 4
+                        zh-TW: 4
+                        bn: 3
+                        id: 3
+                        lt: 3
+                        is: 2
+                        ja: 2
+                        th: 2
+                        my: 1
+                        ca: 1
+                        hi: 1
+                        ml: 1
+                        mn: 1
+                        uk: 1
+                        vi: 1
+                      subtitles_count: 1034
+                      seasons_count: 0
+                      parent_title: ""
+                      season_number: 0
+                      imdb_id: 133093
+                      tmdb_id: 603
+                      feature_id: "646193"
+                      title_aka:
+                      - Матрицата
+                      - ' The Matrix'
+                      - ' Matrix'
+                      - ' ماتریکس'
+                      - ' מטריקס'
+                      - ' Mátrix'
+                      - ' マトリックス'
+                      - ' 매트릭스'
+                      - ' Matrica'
+                      - ' 黑客帝国'
+                      - ' Матрица'
+                      - ' Матрикс'
+                      - " เดอะ เมทริกซ์ : เพาะพันธุ์มนุษย์เหนือโลก 2199"
+                      - ' Матриця'
+                      feature_type: Movie
+                      url: https://www.opensubtitles.com/en/movies/1999-the-matrix
+                      img_url: "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_UX182_CR0,0,182,268_AL_.jpg"
+                      seasons: []
+                  - id: "646060"
+                    type: feature
+                    attributes:
+                      title: The Matrix Revolutions
+                      original_title: The Matrix Revolutions
+                      year: "2003"
+                      subtitles_counts:
+                        tr: 29
+                        es: 26
+                        en: 22
+                        sr: 22
+                        ro: 20
+                        pt-BR: 16
+                        bg: 15
+                        cs: 14
+                        pt-PT: 12
+                        sl: 11
+                        pl: 10
+                        fi: 9
+                        fr: 8
+                        ar: 7
+                        et: 7
+                        nl: 6
+                        he: 6
+                        el: 5
+                        hu: 5
+                        da: 4
+                        mk: 4
+                        hr: 3
+                        id: 3
+                        sk: 3
+                        sq: 1
+                        zh-CN: 1
+                        de: 1
+                        is: 1
+                        it: 1
+                        lt: 1
+                        "no": 1
+                        ru: 1
+                        sv: 1
+                      subtitles_count: 818
+                      seasons_count: 0
+                      parent_title: ""
+                      season_number: 0
+                      imdb_id: 242653
+                      tmdb_id: 605
+                      feature_id: "646060"
+                      title_aka:
+                      - "Матрицата: Революции"
+                      - ' Matrix Revolutions'
+                      - " The Matrix: Revolutions"
+                      - ' The Matrix Revolutions'
+                      - ' Matrix revolutions'
+                      - ' انقلاب‌های ماتریکس'
+                      - ' מטריקס רבולושנס'
+                      - ' Mátrix - Forradalmak'
+                      - " 매트릭스 3: 레볼루션"
+                      - ' Matrix - Revoluții'
+                      - " Матрица: Революция"
+                      - ' ปฎิวัติมนุษย์เหนือโลก'
+                      - " Матриця: Революція"
+                      - ' 黑客帝国3：矩阵革命'
+                      feature_type: Movie
+                      url: https://www.opensubtitles.com/en/movies/2003-the-matrix-revolutions
+                      img_url: "https://m.media-amazon.com/images/M/MV5BNzNlZTZjMDctZjYwNi00NzljLWIwN2QtZWZmYmJiYzQ0MTk2XkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_UX182_CR0,0,182,268_AL_.jpg"
+                      seasons: []
+          description: Search for a feature
+      security:
+      - Api-Key: []
+      summary: Search for features
+      tags:
+      - Features
+      x-accepts: application/json
+  /subtitles:
+    get:
+      deprecated: false
+      description: "Find subtitle for a video file. All parameters can be combined\
+        \ following various logics: searching by a specific external id (imdb, tmdb),\
+        \ a file moviehash, or a simple text query.\n\n<!-- theme: warning -->\n>\
+        \ Something wrong? Read about [common mistakes and best practices](docs/2-Best-Practices.md).\
+        \ \n\n> Getting no results? Follow HTTP redirects! ```curl --location``` and\
+        \ use verbose mode\n\n\nImplement the logic that best fit your needs, remembering\
+        \ that:\n- if you can get moviehash from file - send it\n- if you know the\
+        \ ID, IMDB or TMDB, send this rather than a query, an ID will always be more\
+        \ precise\n- if you search for TV show episodes, sending the parent ID, episode\
+        \ and season number will give best results\n- send the filename as ```query```\
+        \ parameter together with the ```moviehash``` for better results. If your\
+        \ filenames are generally irrelevant, for example a dynamically generated\
+        \ filename from a streaming service, no need to send it.\n- you can combine\
+        \ all together (send everything what you have and we will take of rest)\n\n\
+        \n> Avoid http redirection by sending request parameters sorted and without\
+        \ default values, and send all queries in lowercase. Remove leading zeroes\
+        \ in ID parameters (IMDB ID, TMDB ID...)\n\n### Moviehash \nIf a ```moviehash```\
+        \ is sent with a request, a ```moviehash_match``` boolean field will be added\
+        \ to the response.\n\nThe matching subtitles will always come first in the\
+        \ response.\n\n\n### Ordering\nYou can order the results using the ```order_by```\
+        \ parameter. Ordering is possible on the following fields:\n```language```,\
+        \ ```download_count```, ```new_download_count```, ```hearing_impaired```,\
+        \ ```hd```, ```fps```, ```votes```, ```points```, ```ratings```, ```from_trusted```,\
+        \ ```foreign_parts_only```, ```ai_translated```, ```machine_translated```,\
+        \ ```upload_date```, ```release```, ```comments```\n\nChange the order direction\
+        \ with *order_direction* (asc/desc)\n\n### Final notes\n```ai_translated```\
+        \ (default include in search results) subtitles should be much better quality\
+        \ than ```machine_translated``` subtitles (excluded in search results).\n\n"
+      operationId: subtitles
+      parameters:
+      - description: ID of the movie or episode
+        explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: IMDB ID of the movie or episode
+        explode: true
+        in: query
+        name: imdb_id
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: TMDB ID of the movie or episode
+        explode: true
+        in: query
+        name: tmdb_id
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: "movie, episode or all, (default: all) "
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: file name or text search
+        explode: true
+        in: query
+        name: query
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Language code(s), coma separated (en,fr)"
+        explode: true
+        in: query
+        name: languages
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Moviehash of the movie
+        explode: true
+        in: query
+        name: moviehash
+        required: false
+        schema:
+          maxLength: 16
+          minLength: 16
+          pattern: "^[a-f0-9]{16}$"
+          type: string
+        style: form
+      - description: To be used alone - for user uploads listing
+        explode: true
+        in: query
+        name: user_id
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: "include, exclude, only. (default: include)"
+        explode: true
+        in: query
+        name: hearing_impaired
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "exclude, include, only (default: include)"
+        explode: true
+        in: query
+        name: foreign_parts_only
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "include, only (default: include)"
+        explode: true
+        in: query
+        name: trusted_sources
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "exclude, include  (default: exclude)"
+        explode: true
+        in: query
+        name: machine_translated
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "exclude, include  (default: include)"
+        explode: true
+        in: query
+        name: ai_translated
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Order of the returned results, accept any of above fields"
+        explode: true
+        in: query
+        name: order_by
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Order direction of the returned results (asc,desc)"
+        explode: true
+        in: query
+        name: order_direction
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: For Tvshows
+        explode: true
+        in: query
+        name: parent_feature_id
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: For Tvshows
+        explode: true
+        in: query
+        name: parent_imdb_id
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: For Tvshows
+        explode: true
+        in: query
+        name: parent_tmdb_id
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: |
+          For Tvshows
+        explode: true
+        in: query
+        name: season_number
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: For Tvshows
+        explode: true
+        in: query
+        name: episode_number
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter by movie/episode year
+        explode: true
+        in: query
+        name: year
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: "include, only (default: include)"
+        explode: true
+        in: query
+        name: moviehash_match
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Results page to display
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: ""
+      security:
+      - Api-Key: []
+      summary: Search for subtitles
+      tags:
+      - Subtitles
+      x-accepts: application/json
+  /download:
+    post:
+      deprecated: false
+      description: |-
+        Request a download url for a subtitle. Subtitle file in temporary URL will be always in UTF-8 encoding.
+
+        <!-- theme: warning -->
+
+        > VERY IMPORTANT: In HTTP request must be both headers: ```Api-Key``` and ```Authorization``` stoplight.io doesn't allow to use in shown example both headers
+
+
+        > The download count is calculated on this action, not the file download itself
+
+        > IN and OUT FPS must be indicated for subtitle conversions, we want to make sure you know what you are doing, and therefore collected the current FPS from the subtitle search result, or calculated it somehow.
+
+        <!-- theme: warning -->
+
+        > The download URL is temporary, and cannot be used more than 3 hours, so do not cache it, but you can download the file more than once if needed.
+      operationId: download
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example-1:
+                value:
+                  file_id: 123
+            schema:
+              $ref: '#/components/schemas/download_request'
+        description: ""
+        required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                example-1:
+                  value:
+                    link: https://www.opensubtitles.com/download/A184A5EA6302F2CA7FD9D49BCEA49A1F36662BBEFB8C9B0ECDC9BB6CAF4BF09A5AA8D7B95C7FBD01615021D1973BAC18D431A8E6A1F627E4617341E8508A6968532088A68B6DDDA996C0116E2CE6F778ED9096A9CAB942B42B59C4EA93F1A7D61FCD6CBBC29C720EBD40CE674A55375862F00981E5D2F315A0982766A2004E0ED0AD9ADABEB506A638F1B829DBC2BE15979F22DA123523967F4D4069BC32098F1086F09AAA776CC365ED744633FD5FA7160B65A2C83539DF30134F5BE6272E46019AF9FD2423AFE12E1DC8642CDB56B8FEB9A4C1F30BF68EF431A3D4ABD3A7E44559E3E572210E5A5A33EC282D3445C537C5DA9DA598300A9900FA1B3B92983FD1504FDDFB34F89E409BF03EC662FC5734F25843C277A64B7C603156926FC6C74AA1D14AABEA6E20/subfile/castle.rock.s01e03.webrip.x264-tbs.ettv.-eng.ro.srt
+                    file_name: castle.rock.s01e03.webrip.x264-tbs.ettv.-eng.ro.srt
+                    requests: 3
+                    remaining: 97
+                    message: 'Your quota will be renewed in 07 hours and 30 minutes
+                      (2022-04-08 13:03:16 UTC) '
+                    reset_time: 07 hours and 30 minutes
+                    reset_time_utc: 2022-04-08T13:03:16.000Z
+              schema:
+                $ref: '#/components/schemas/download_200_response'
+          description: "Request a download URL for a subtitle. \n"
+      security:
+      - Bearer: []
+      - Api-Key: []
+      summary: Download
+      tags:
+      - Download
+      x-codegen-request-body-name: body
+      x-content-type: application/json
+      x-accepts: application/json
+  /utilities/guessit:
+    get:
+      description: |-
+        Extracts as much information as possible from a video filename.
+
+        It has a very powerful matcher that allows to guess properties from a video using its filename only. This matcher works with both movies and tv shows episodes.
+
+        This is a simple implementation of the python guessit library.
+        https://doc.guessit.io
+
+        Find examples of the returned data.
+        https://doc.guessit.io/properties/
+      operationId: guessit
+      parameters:
+      - description: File name
+        explode: true
+        in: query
+        name: filename
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guessit_200_response'
+          description: OK
+      security:
+      - Api-Key: []
+      summary: Guessit
+      tags:
+      - Utilities
+      x-accepts: application/json
+components:
+  schemas:
+    Subtitle:
+      description: ""
+      example:
+        attributes:
+          legacy_subtitle_id: 7.061401241503109
+          comments: comments
+          related_links:
+          - "{}"
+          - "{}"
+          release: release
+          fps: 1.4658129805029452
+          language: language
+          feature_details:
+            feature_id: 3.616076749251911
+            feature_type: feature_type
+            tmdb_id: 7.386281948385884
+            year: 2.027123023002322
+            imdb_id: 4.145608029883936
+            movie_name: movie_name
+            title: title
+          subtitle_id: subtitle_id
+          from_trusted: true
+          url: url
+          download_count: 0.8008281904610115
+          points: 5.637376656633329
+          ai_translated: true
+          new_download_count: 6.027456183070403
+          foreign_parts_only: true
+          machine_translated: true
+          ratings: 2.3021358869347655
+          uploader:
+            uploader_id: 9.301444243932576
+            name: name
+            rank: rank
+          files:
+          - ? ""
+            : ""
+            cd_number: 1.0246457001441578
+            file_name: file_name
+            file_id: 1.2315135367772556
+          - ? ""
+            : ""
+            cd_number: 1.0246457001441578
+            file_name: file_name
+            file_id: 1.2315135367772556
+          hearing_impaired: true
+          votes: 5.962133916683182
+          hd: true
+          upload_date: upload_date
+        id: id
+        type: type
+      properties:
+        id:
+          minLength: 1
+          type: string
+        type:
+          minLength: 1
+          type: string
+        attributes:
+          $ref: '#/components/schemas/Subtitle_attributes'
+      required:
+      - attributes
+      - id
+      - type
+      title: ""
+      type: object
+      x-tags:
+      - Models
+    Feature-Tvshow:
+      description: ""
+      example:
+        attributes:
+          feature_id: feature_id
+          tmdb_id: 7.606863723092579
+          seasons:
+          - season_number: 1.7045651386993
+            episodes:
+            - feature_id: 3.209082285545927
+              episode_number: 4.4935252719377825
+              feature_imdb_id: 8.262795412896967
+              title: title
+            - feature_id: 3.209082285545927
+              episode_number: 4.4935252719377825
+              feature_imdb_id: 8.262795412896967
+              title: title
+          - season_number: 1.7045651386993
+            episodes:
+            - feature_id: 3.209082285545927
+              episode_number: 4.4935252719377825
+              feature_imdb_id: 8.262795412896967
+              title: title
+            - feature_id: 3.209082285545927
+              episode_number: 4.4935252719377825
+              feature_imdb_id: 8.262795412896967
+              title: title
+          original_title: original_title
+          subtitles_count: 9.402167524121316
+          year: year
+          imdb_id: 8.37823741034869
+          img_url: img_url
+          title_aka:
+          - "{}"
+          - "{}"
+          title: title
+          url: url
+          subtitles_counts:
+            de: 4.8789878742268815
+            "no": 1.5970080735609526
+            fi: 7.203794749804894
+            ru: 5.6644160867523485
+            bg: 0.58919091925136
+            hr: 2.7977867356748476
+            fr: 4.518309517874243
+            hu: 3.804112695731078
+            zh-CN: 1.0639121808530916
+            bs: 1.3949519358941398
+            sk: 7.3718573971919445
+            sl: 9.386524999783381
+            id: 9.785002165136461
+            mk: 3.812761638325517
+            ca: 3.2841216543560217
+            sr: 2.535258963197524
+            sv: 6.173804034172511
+            ko: 7.726998920545485
+            zh-TW: 7.92839742024475
+            pt-BR: 9.897492629215506
+            el: 8.675064425986758
+            en: 3.111202833403195
+            it: 1.2555055362323109
+            es: 3.1497903714250555
+            et: 6.966044574347761
+            cs: 0.35262192099236644
+            ar: 4.332304821875894
+            pt-PT: 0.4768402382624515
+            vi: 5.7911894223693885
+            th: 4.372688051310086
+            ja: 5.974942028545841
+            fa: 3.8008573585058016
+            pl: 3.7814124730767915
+            ro: 5.877124706116695
+            he: 2.380090174313445
+            da: 9.806951670467935
+            nl: 7.835035282970782
+            tr: 0.4833312865174044
+        id: id
+        type: type
+      properties:
+        id:
+          minLength: 1
+          type: string
+        type:
+          minLength: 1
+          type: string
+        attributes:
+          $ref: '#/components/schemas/Feature_Tvshow_attributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+      x-tags:
+      - Models
+    Feature-Episode:
+      description: ""
+      example:
+        attributes:
+          feature_id: feature_id
+          parent_imdb_id: "{}"
+          tmdb_id: 4.258773108174356
+          original_title: "{}"
+          subtitles_count: 5.312489704336296
+          year: year
+          imdb_id: 6.628464275087742
+          title_aka:
+          - "{}"
+          - "{}"
+          season_number: 4.078845849666752
+          title: title
+          url: url
+          subtitles_counts:
+            de: 9.183123594773994
+            "no": 0.4182561061793122
+            fi: 6.073898085781152
+            ru: 5.299143560275359
+            bg: 3.901545264248647
+            hr: 8.28965939814297
+            fr: 0.43431398824148815
+            hu: 8.251625748923757
+            bs: 1.8268702177058116
+            sl: 2.9409642974827896
+            mk: 8.761432466225475
+            sr: 6.623518433804886
+            sv: 8.863729185622827
+            pt-BR: 7.260521264802104
+            el: 1.7325933120207193
+            en: 4.678947989005849
+            es: 9.132027271330688
+            et: 4.573936264232251
+            cs: 4.86315908102884
+            ar: 4.459605034958679
+            pt-PT: 5.507386964179881
+            th: 9.254183946267839
+            pl: 1.041444916118296
+            ro: 0.8774076871421566
+            he: 7.933506881737151
+            da: 3.502657762086401
+            nl: 9.702963800023566
+            tr: 0.5199002018724985
+          episode_number: 0.2025324113236393
+          img_url: img_url
+          parent_title: parent_title
+        id: id
+        type: type
+      properties:
+        id:
+          minLength: 1
+          type: string
+        type:
+          minLength: 1
+          type: string
+        attributes:
+          $ref: '#/components/schemas/Feature_Episode_attributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+      x-tags:
+      - Models
+    Feature-Movie:
+      description: ""
+      example:
+        attributes:
+          feature_id: feature_id
+          tmdb_id: 3.2588565619047607
+          parent_imdb_id: "{}"
+          original_title: original_title
+          subtitles_count: 3.0205796992916243
+          year: year
+          imdb_id: 5.533258397034986
+          title_aka:
+          - "{}"
+          - "{}"
+          season_number: 7.04836565559697
+          title: title
+          url: url
+          subtitles_counts:
+            de: 9.965781217890562
+            "no": 3.5571952270680973
+            fi: 1.4658129805029452
+            ru: 8.969578798196912
+            bg: 4.965218492984954
+            lt: 7.058770351582356
+            hr: 9.018348186070783
+            fr: 1.4894159098541704
+            bn: 3.0937452626664474
+            zh-CN: 4.145608029883936
+            hu: 1.0246457001441578
+            uk: 6.704019297950036
+            ka: 7.143538047012306
+            sk: 5.944895607614016
+            sl: 6.84685269835264
+            id: 3.616076749251911
+            mk: 6.519180951018382
+            sr: 9.301444243932576
+            ml: 0.10263654006109402
+            sv: 6.965117697638846
+            ko: 6.438423552598547
+            zh-TW: 3.353193347011243
+            pt-BR: 5.962133916683182
+            ms: 4.652396432933246
+            el: 1.2315135367772556
+            en: 0.8008281904610115
+            it: 6.683562403749608
+            ze: 7.740351818741173
+            ta: 1.284659006116532
+            es: 5.637376656633329
+            et: 1.1730742509559433
+            cs: 5.025004791520295
+            eu: 2.8841621266687802
+            ar: 2.3021358869347655
+            pt-PT: 6.027456183070403
+            vi: 8.762042012749001
+            ja: 0.8851374739011653
+            fa: 6.878052220127876
+            pl: 7.061401241503109
+            ro: 2.027123023002322
+            he: 9.369310271410669
+            da: 6.778324963048013
+            nl: 7.386281948385884
+            tr: 7.457744773683766
+          feature_type: feature_type
+          episode_number: "{}"
+          seasons_count: 3.0576100241049344
+          img_url: img_url
+          parent_title: parent_title
+        id: id
+        type: type
+      properties:
+        id:
+          minLength: 1
+          type: string
+        type:
+          minLength: 1
+          type: string
+        attributes:
+          $ref: '#/components/schemas/Feature_Movie_attributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+      x-tags:
+      - Models
+    login_request:
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - username
+      type: object
+      x-examples:
+        example:
+          username: ""
+          password: ""
+    login_200_response_user:
+      example:
+        allowed_downloads: 6.027456183070403
+        allowed_translations: 0.8008281904610115
+        level: VIP Member
+        user_id: 1.4658129805029452
+        ext_installed: true
+        vip: true
+      properties:
+        allowed_translations:
+          type: number
+        allowed_downloads:
+          type: number
+        level:
+          example: VIP Member
+          minLength: 1
+          type: string
+        user_id:
+          type: number
+        ext_installed:
+          type: boolean
+        vip:
+          type: boolean
+      required:
+      - allowed_downloads
+      - allowed_translations
+      - ext_installed
+      - level
+      - user_id
+      - vip
+      type: object
+    login_200_response:
+      example:
+        base_url: api.opensubtitles.com
+        user:
+          allowed_downloads: 6.027456183070403
+          allowed_translations: 0.8008281904610115
+          level: VIP Member
+          user_id: 1.4658129805029452
+          ext_installed: true
+          vip: true
+        token: token
+        status: 5.962133916683182
+      properties:
+        user:
+          $ref: '#/components/schemas/login_200_response_user'
+        base_url:
+          default: api.opensubtitles.com
+          enum:
+          - api.opensubtitles.com
+          - vip-api.opensubtitles.com
+          example: api.opensubtitles.com
+          format: hostname
+          type: string
+        token:
+          minLength: 1
+          type: string
+        status:
+          type: number
+      required:
+      - base_url
+      - status
+      - token
+      - user
+      type: object
+    formats_200_response_data:
+      example:
+        output_formats:
+        - ""
+        - ""
+      properties:
+        output_formats:
+          items: {}
+          type: array
+      required:
+      - output_formats
+      type: object
+    formats_200_response:
+      description: ""
+      example:
+        data:
+          output_formats:
+          - ""
+          - ""
+      properties:
+        data:
+          $ref: '#/components/schemas/formats_200_response_data'
+      required:
+      - data
+      type: object
+      x-examples:
+        example-1:
+          data:
+            output_formats:
+            - srt
+            - sub
+            - mpl
+            - webvtt
+            - dfxp
+            - txt
+    languages_200_response_data_inner:
+      example:
+        language_code: language_code
+        language_name: language_name
+      properties:
+        language_code:
+          minLength: 1
+          type: string
+        language_name:
+          minLength: 1
+          type: string
+      required:
+      - language_code
+      - language_name
+      type: object
+    languages_200_response:
+      description: ""
+      example:
+        data:
+        - language_code: language_code
+          language_name: language_name
+        - language_code: language_code
+          language_name: language_name
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/languages_200_response_data_inner'
+          minItems: 1
+          type: array
+          uniqueItems: true
+      required:
+      - data
+      type: object
+    userinfo_200_response_data:
+      example:
+        allowed_downloads: 0.8008281904610115
+        level: level
+        user_id: 6.027456183070403
+        remaining_downloads: 5.962133916683182
+        ext_installed: true
+        vip: true
+        downloads_count: 1.4658129805029452
+      properties:
+        allowed_downloads:
+          type: number
+        level:
+          minLength: 1
+          type: string
+        user_id:
+          type: number
+        ext_installed:
+          type: boolean
+        vip:
+          type: boolean
+        downloads_count:
+          type: number
+        remaining_downloads:
+          type: number
+      required:
+      - allowed_downloads
+      - downloads_count
+      - ext_installed
+      - level
+      - remaining_downloads
+      - user_id
+      - vip
+      type: object
+    userinfo_200_response:
+      description: ""
+      example:
+        data:
+          allowed_downloads: 0.8008281904610115
+          level: level
+          user_id: 6.027456183070403
+          remaining_downloads: 5.962133916683182
+          ext_installed: true
+          vip: true
+          downloads_count: 1.4658129805029452
+      properties:
+        data:
+          $ref: '#/components/schemas/userinfo_200_response_data'
+      required:
+      - data
+      type: object
+    latest_200_response_data_inner_attributes_uploader:
+      example:
+        uploader_id: 4.145608029883936
+        name: name
+        rank: rank
+      properties:
+        uploader_id:
+          type: number
+        name:
+          minLength: 1
+          type: string
+        rank:
+          minLength: 1
+          type: string
+      required:
+      - name
+      - rank
+      - uploader_id
+      type: object
+    latest_200_response_data_inner_attributes_feature_details:
+      example:
+        feature_id: 7.386281948385884
+        feature_type: feature_type
+        tmdb_id: "{}"
+        year: 1.2315135367772556
+        imdb_id: 1.0246457001441578
+        movie_name: movie_name
+        title: title
+      properties:
+        feature_id:
+          type: number
+        feature_type:
+          minLength: 1
+          type: string
+        year:
+          type: number
+        title:
+          minLength: 1
+          type: string
+        movie_name:
+          minLength: 1
+          type: string
+        imdb_id:
+          type: number
+        tmdb_id:
+          type: object
+      required:
+      - feature_id
+      - feature_type
+      - imdb_id
+      - movie_name
+      - title
+      - year
+      type: object
+    latest_200_response_data_inner_attributes_related_links:
+      example:
+        img_url: img_url
+        label: label
+        url: url
+      properties:
+        label:
+          minLength: 1
+          type: string
+        url:
+          minLength: 1
+          type: string
+        img_url:
+          minLength: 1
+          type: string
+      required:
+      - img_url
+      - label
+      - url
+      type: object
+    latest_200_response_data_inner_attributes_files_inner:
+      example:
+        cd_number: 6.84685269835264
+        file_name: file_name
+        file_id: 1.4894159098541704
+      properties:
+        file_id:
+          type: number
+        cd_number:
+          type: number
+        file_name:
+          minLength: 1
+          type: string
+      required:
+      - cd_number
+      - file_id
+      - file_name
+      type: object
+    latest_200_response_data_inner_attributes:
+      example:
+        legacy_subtitle_id: 2.027123023002322
+        comments: comments
+        related_links:
+          img_url: img_url
+          label: label
+          url: url
+        release: release
+        format: "{}"
+        fps: 2.3021358869347655
+        language: language
+        feature_details:
+          feature_id: 7.386281948385884
+          feature_type: feature_type
+          tmdb_id: "{}"
+          year: 1.2315135367772556
+          imdb_id: 1.0246457001441578
+          movie_name: movie_name
+          title: title
+        subtitle_id: subtitle_id
+        from_trusted: true
+        url: url
+        download_count: 5.962133916683182
+        points: 9.301444243932576
+        ai_translated: true
+        new_download_count: 5.637376656633329
+        foreign_parts_only: true
+        machine_translated: "{}"
+        ratings: 3.616076749251911
+        uploader:
+          uploader_id: 4.145608029883936
+          name: name
+          rank: rank
+        files:
+        - cd_number: 6.84685269835264
+          file_name: file_name
+          file_id: 1.4894159098541704
+        - cd_number: 6.84685269835264
+          file_name: file_name
+          file_id: 1.4894159098541704
+        hearing_impaired: true
+        votes: 7.061401241503109
+        hd: true
+        upload_date: upload_date
+      properties:
+        subtitle_id:
+          minLength: 1
+          type: string
+        language:
+          minLength: 1
+          type: string
+        download_count:
+          type: number
+        new_download_count:
+          type: number
+        hearing_impaired:
+          type: boolean
+        hd:
+          type: boolean
+        format:
+          type: object
+        fps:
+          type: number
+        votes:
+          type: number
+        points:
+          type: number
+        ratings:
+          type: number
+        from_trusted:
+          type: boolean
+        foreign_parts_only:
+          type: boolean
+        ai_translated:
+          type: boolean
+        machine_translated:
+          type: object
+        upload_date:
+          minLength: 1
+          type: string
+        release:
+          minLength: 1
+          type: string
+        comments:
+          type: string
+        legacy_subtitle_id:
+          type: number
+        uploader:
+          $ref: '#/components/schemas/latest_200_response_data_inner_attributes_uploader'
+        feature_details:
+          $ref: '#/components/schemas/latest_200_response_data_inner_attributes_feature_details'
+        url:
+          minLength: 1
+          type: string
+        related_links:
+          $ref: '#/components/schemas/latest_200_response_data_inner_attributes_related_links'
+        files:
+          items:
+            $ref: '#/components/schemas/latest_200_response_data_inner_attributes_files_inner'
+          minItems: 1
+          type: array
+          uniqueItems: true
+      required:
+      - ai_translated
+      - comments
+      - download_count
+      - feature_details
+      - files
+      - foreign_parts_only
+      - fps
+      - from_trusted
+      - hd
+      - hearing_impaired
+      - language
+      - legacy_subtitle_id
+      - new_download_count
+      - points
+      - ratings
+      - related_links
+      - release
+      - subtitle_id
+      - upload_date
+      - uploader
+      - url
+      - votes
+      type: object
+    latest_200_response_data_inner:
+      example:
+        attributes:
+          legacy_subtitle_id: 2.027123023002322
+          comments: comments
+          related_links:
+            img_url: img_url
+            label: label
+            url: url
+          release: release
+          format: "{}"
+          fps: 2.3021358869347655
+          language: language
+          feature_details:
+            feature_id: 7.386281948385884
+            feature_type: feature_type
+            tmdb_id: "{}"
+            year: 1.2315135367772556
+            imdb_id: 1.0246457001441578
+            movie_name: movie_name
+            title: title
+          subtitle_id: subtitle_id
+          from_trusted: true
+          url: url
+          download_count: 5.962133916683182
+          points: 9.301444243932576
+          ai_translated: true
+          new_download_count: 5.637376656633329
+          foreign_parts_only: true
+          machine_translated: "{}"
+          ratings: 3.616076749251911
+          uploader:
+            uploader_id: 4.145608029883936
+            name: name
+            rank: rank
+          files:
+          - cd_number: 6.84685269835264
+            file_name: file_name
+            file_id: 1.4894159098541704
+          - cd_number: 6.84685269835264
+            file_name: file_name
+            file_id: 1.4894159098541704
+          hearing_impaired: true
+          votes: 7.061401241503109
+          hd: true
+          upload_date: upload_date
+        id: id
+        type: type
+      properties:
+        id:
+          minLength: 1
+          type: string
+        type:
+          minLength: 1
+          type: string
+        attributes:
+          $ref: '#/components/schemas/latest_200_response_data_inner_attributes'
+      required:
+      - id
+      - type
+      type: object
+    latest_200_response:
+      description: ""
+      example:
+        data:
+        - attributes:
+            legacy_subtitle_id: 2.027123023002322
+            comments: comments
+            related_links:
+              img_url: img_url
+              label: label
+              url: url
+            release: release
+            format: "{}"
+            fps: 2.3021358869347655
+            language: language
+            feature_details:
+              feature_id: 7.386281948385884
+              feature_type: feature_type
+              tmdb_id: "{}"
+              year: 1.2315135367772556
+              imdb_id: 1.0246457001441578
+              movie_name: movie_name
+              title: title
+            subtitle_id: subtitle_id
+            from_trusted: true
+            url: url
+            download_count: 5.962133916683182
+            points: 9.301444243932576
+            ai_translated: true
+            new_download_count: 5.637376656633329
+            foreign_parts_only: true
+            machine_translated: "{}"
+            ratings: 3.616076749251911
+            uploader:
+              uploader_id: 4.145608029883936
+              name: name
+              rank: rank
+            files:
+            - cd_number: 6.84685269835264
+              file_name: file_name
+              file_id: 1.4894159098541704
+            - cd_number: 6.84685269835264
+              file_name: file_name
+              file_id: 1.4894159098541704
+            hearing_impaired: true
+            votes: 7.061401241503109
+            hd: true
+            upload_date: upload_date
+          id: id
+          type: type
+        - attributes:
+            legacy_subtitle_id: 2.027123023002322
+            comments: comments
+            related_links:
+              img_url: img_url
+              label: label
+              url: url
+            release: release
+            format: "{}"
+            fps: 2.3021358869347655
+            language: language
+            feature_details:
+              feature_id: 7.386281948385884
+              feature_type: feature_type
+              tmdb_id: "{}"
+              year: 1.2315135367772556
+              imdb_id: 1.0246457001441578
+              movie_name: movie_name
+              title: title
+            subtitle_id: subtitle_id
+            from_trusted: true
+            url: url
+            download_count: 5.962133916683182
+            points: 9.301444243932576
+            ai_translated: true
+            new_download_count: 5.637376656633329
+            foreign_parts_only: true
+            machine_translated: "{}"
+            ratings: 3.616076749251911
+            uploader:
+              uploader_id: 4.145608029883936
+              name: name
+              rank: rank
+            files:
+            - cd_number: 6.84685269835264
+              file_name: file_name
+              file_id: 1.4894159098541704
+            - cd_number: 6.84685269835264
+              file_name: file_name
+              file_id: 1.4894159098541704
+            hearing_impaired: true
+            votes: 7.061401241503109
+            hd: true
+            upload_date: upload_date
+          id: id
+          type: type
+        total_count: 6.027456183070403
+        total_pages: 0.8008281904610115
+        page: 1.4658129805029452
+      properties:
+        total_pages:
+          type: number
+        total_count:
+          type: number
+        page:
+          type: number
+        data:
+          items:
+            $ref: '#/components/schemas/latest_200_response_data_inner'
+          minItems: 1
+          type: array
+          uniqueItems: true
+      required:
+      - data
+      - page
+      - total_count
+      - total_pages
+      type: object
+    most_downloaded_200_response:
+      description: ""
+      example:
+        data:
+        - attributes:
+            legacy_subtitle_id: 7.061401241503109
+            comments: comments
+            related_links:
+            - "{}"
+            - "{}"
+            release: release
+            fps: 1.4658129805029452
+            language: language
+            feature_details:
+              feature_id: 3.616076749251911
+              feature_type: feature_type
+              tmdb_id: 7.386281948385884
+              year: 2.027123023002322
+              imdb_id: 4.145608029883936
+              movie_name: movie_name
+              title: title
+            subtitle_id: subtitle_id
+            from_trusted: true
+            url: url
+            download_count: 0.8008281904610115
+            points: 5.637376656633329
+            ai_translated: true
+            new_download_count: 6.027456183070403
+            foreign_parts_only: true
+            machine_translated: true
+            ratings: 2.3021358869347655
+            uploader:
+              uploader_id: 9.301444243932576
+              name: name
+              rank: rank
+            files:
+            - ? ""
+              : ""
+              cd_number: 1.0246457001441578
+              file_name: file_name
+              file_id: 1.2315135367772556
+            - ? ""
+              : ""
+              cd_number: 1.0246457001441578
+              file_name: file_name
+              file_id: 1.2315135367772556
+            hearing_impaired: true
+            votes: 5.962133916683182
+            hd: true
+            upload_date: upload_date
+          id: id
+          type: type
+        - attributes:
+            legacy_subtitle_id: 7.061401241503109
+            comments: comments
+            related_links:
+            - "{}"
+            - "{}"
+            release: release
+            fps: 1.4658129805029452
+            language: language
+            feature_details:
+              feature_id: 3.616076749251911
+              feature_type: feature_type
+              tmdb_id: 7.386281948385884
+              year: 2.027123023002322
+              imdb_id: 4.145608029883936
+              movie_name: movie_name
+              title: title
+            subtitle_id: subtitle_id
+            from_trusted: true
+            url: url
+            download_count: 0.8008281904610115
+            points: 5.637376656633329
+            ai_translated: true
+            new_download_count: 6.027456183070403
+            foreign_parts_only: true
+            machine_translated: true
+            ratings: 2.3021358869347655
+            uploader:
+              uploader_id: 9.301444243932576
+              name: name
+              rank: rank
+            files:
+            - ? ""
+              : ""
+              cd_number: 1.0246457001441578
+              file_name: file_name
+              file_id: 1.2315135367772556
+            - ? ""
+              : ""
+              cd_number: 1.0246457001441578
+              file_name: file_name
+              file_id: 1.2315135367772556
+            hearing_impaired: true
+            votes: 5.962133916683182
+            hd: true
+            upload_date: upload_date
+          id: id
+          type: type
+        total_count: 6.027456183070403
+        total_pages: 0.8008281904610115
+        page: 1.4658129805029452
+      properties:
+        total_pages:
+          type: number
+        total_count:
+          type: number
+        page:
+          type: number
+        data:
+          items:
+            $ref: '#/components/schemas/Subtitle'
+          minItems: 1
+          type: array
+          uniqueItems: true
+      required:
+      - data
+      - page
+      - total_count
+      - total_pages
+      type: object
+    features_200_response:
+      description: ""
+      example:
+        tv:
+          attributes:
+            feature_id: feature_id
+            tmdb_id: 7.606863723092579
+            seasons:
+            - season_number: 1.7045651386993
+              episodes:
+              - feature_id: 3.209082285545927
+                episode_number: 4.4935252719377825
+                feature_imdb_id: 8.262795412896967
+                title: title
+              - feature_id: 3.209082285545927
+                episode_number: 4.4935252719377825
+                feature_imdb_id: 8.262795412896967
+                title: title
+            - season_number: 1.7045651386993
+              episodes:
+              - feature_id: 3.209082285545927
+                episode_number: 4.4935252719377825
+                feature_imdb_id: 8.262795412896967
+                title: title
+              - feature_id: 3.209082285545927
+                episode_number: 4.4935252719377825
+                feature_imdb_id: 8.262795412896967
+                title: title
+            original_title: original_title
+            subtitles_count: 9.402167524121316
+            year: year
+            imdb_id: 8.37823741034869
+            img_url: img_url
+            title_aka:
+            - "{}"
+            - "{}"
+            title: title
+            url: url
+            subtitles_counts:
+              de: 4.8789878742268815
+              "no": 1.5970080735609526
+              fi: 7.203794749804894
+              ru: 5.6644160867523485
+              bg: 0.58919091925136
+              hr: 2.7977867356748476
+              fr: 4.518309517874243
+              hu: 3.804112695731078
+              zh-CN: 1.0639121808530916
+              bs: 1.3949519358941398
+              sk: 7.3718573971919445
+              sl: 9.386524999783381
+              id: 9.785002165136461
+              mk: 3.812761638325517
+              ca: 3.2841216543560217
+              sr: 2.535258963197524
+              sv: 6.173804034172511
+              ko: 7.726998920545485
+              zh-TW: 7.92839742024475
+              pt-BR: 9.897492629215506
+              el: 8.675064425986758
+              en: 3.111202833403195
+              it: 1.2555055362323109
+              es: 3.1497903714250555
+              et: 6.966044574347761
+              cs: 0.35262192099236644
+              ar: 4.332304821875894
+              pt-PT: 0.4768402382624515
+              vi: 5.7911894223693885
+              th: 4.372688051310086
+              ja: 5.974942028545841
+              fa: 3.8008573585058016
+              pl: 3.7814124730767915
+              ro: 5.877124706116695
+              he: 2.380090174313445
+              da: 9.806951670467935
+              nl: 7.835035282970782
+              tr: 0.4833312865174044
+          id: id
+          type: type
+        movie:
+          attributes:
+            feature_id: feature_id
+            tmdb_id: 3.2588565619047607
+            parent_imdb_id: "{}"
+            original_title: original_title
+            subtitles_count: 3.0205796992916243
+            year: year
+            imdb_id: 5.533258397034986
+            title_aka:
+            - "{}"
+            - "{}"
+            season_number: 7.04836565559697
+            title: title
+            url: url
+            subtitles_counts:
+              de: 9.965781217890562
+              "no": 3.5571952270680973
+              fi: 1.4658129805029452
+              ru: 8.969578798196912
+              bg: 4.965218492984954
+              lt: 7.058770351582356
+              hr: 9.018348186070783
+              fr: 1.4894159098541704
+              bn: 3.0937452626664474
+              zh-CN: 4.145608029883936
+              hu: 1.0246457001441578
+              uk: 6.704019297950036
+              ka: 7.143538047012306
+              sk: 5.944895607614016
+              sl: 6.84685269835264
+              id: 3.616076749251911
+              mk: 6.519180951018382
+              sr: 9.301444243932576
+              ml: 0.10263654006109402
+              sv: 6.965117697638846
+              ko: 6.438423552598547
+              zh-TW: 3.353193347011243
+              pt-BR: 5.962133916683182
+              ms: 4.652396432933246
+              el: 1.2315135367772556
+              en: 0.8008281904610115
+              it: 6.683562403749608
+              ze: 7.740351818741173
+              ta: 1.284659006116532
+              es: 5.637376656633329
+              et: 1.1730742509559433
+              cs: 5.025004791520295
+              eu: 2.8841621266687802
+              ar: 2.3021358869347655
+              pt-PT: 6.027456183070403
+              vi: 8.762042012749001
+              ja: 0.8851374739011653
+              fa: 6.878052220127876
+              pl: 7.061401241503109
+              ro: 2.027123023002322
+              he: 9.369310271410669
+              da: 6.778324963048013
+              nl: 7.386281948385884
+              tr: 7.457744773683766
+            feature_type: feature_type
+            episode_number: "{}"
+            seasons_count: 3.0576100241049344
+            img_url: img_url
+            parent_title: parent_title
+          id: id
+          type: type
+        episode:
+          attributes:
+            feature_id: feature_id
+            parent_imdb_id: "{}"
+            tmdb_id: 4.258773108174356
+            original_title: "{}"
+            subtitles_count: 5.312489704336296
+            year: year
+            imdb_id: 6.628464275087742
+            title_aka:
+            - "{}"
+            - "{}"
+            season_number: 4.078845849666752
+            title: title
+            url: url
+            subtitles_counts:
+              de: 9.183123594773994
+              "no": 0.4182561061793122
+              fi: 6.073898085781152
+              ru: 5.299143560275359
+              bg: 3.901545264248647
+              hr: 8.28965939814297
+              fr: 0.43431398824148815
+              hu: 8.251625748923757
+              bs: 1.8268702177058116
+              sl: 2.9409642974827896
+              mk: 8.761432466225475
+              sr: 6.623518433804886
+              sv: 8.863729185622827
+              pt-BR: 7.260521264802104
+              el: 1.7325933120207193
+              en: 4.678947989005849
+              es: 9.132027271330688
+              et: 4.573936264232251
+              cs: 4.86315908102884
+              ar: 4.459605034958679
+              pt-PT: 5.507386964179881
+              th: 9.254183946267839
+              pl: 1.041444916118296
+              ro: 0.8774076871421566
+              he: 7.933506881737151
+              da: 3.502657762086401
+              nl: 9.702963800023566
+              tr: 0.5199002018724985
+            episode_number: 0.2025324113236393
+            img_url: img_url
+            parent_title: parent_title
+          id: id
+          type: type
+      properties:
+        movie:
+          $ref: '#/components/schemas/Feature-Movie'
+        episode:
+          $ref: '#/components/schemas/Feature-Episode'
+        tv:
+          $ref: '#/components/schemas/Feature-Tvshow'
+      type: object
+    download_request:
+      description: ""
+      properties:
+        file_id:
+          description: file_id from /subtitles search results
+          example: 123
+          format: int32
+          type: integer
+        sub_format:
+          description: from /infos/formats
+          type: string
+        file_name:
+          description: desired file name
+          type: string
+        in_fps:
+          description: "used for conversions, in_fps and out_fps must then be indicated"
+          type: number
+        out_fps:
+          description: "used for conversions, in_fps and out_fps must then be indicated"
+          type: number
+        timeshift:
+          description: ""
+          type: number
+        force_download:
+          description: (1/0) set subtitle file headers to "application/force-download"
+          type: boolean
+      required:
+      - file_id
+      type: object
+      x-examples:
+        example-1:
+          file_id: ""
+          sub_format: ""
+          file_name: ""
+          in_fps: ""
+          out_fps: ""
+          timeshift: ""
+          force_download: ""
+    download_200_response:
+      description: ""
+      example:
+        file_name: file_name
+        link: link
+        requests: 0.8008281904610115
+        message: message
+        remaining: 6.027456183070403
+        reset_time: reset_time
+        reset_time_utc: reset_time_utc
+      properties:
+        link:
+          minLength: 1
+          type: string
+        file_name:
+          minLength: 1
+          type: string
+        requests:
+          type: number
+        remaining:
+          type: number
+        message:
+          minLength: 1
+          type: string
+        reset_time:
+          minLength: 1
+          type: string
+        reset_time_utc:
+          minLength: 1
+          type: string
+      required:
+      - file_name
+      - link
+      - message
+      - remaining
+      - requests
+      - reset_time
+      - reset_time_utc
+      type: object
+      x-examples:
+        example-1:
+          link: https://www.opensubtitles.com/download/A184A5EA6302F2CA7FD9D49BCEA49A1F36662BBEFB8C9B0ECDC9BB6CAF4BF09A5AA8D7B95C7FBD01615021D1973BAC18D431A8E6A1F627E4617341E8508A6968532088A68B6DDDA996C0116E2CE6F778ED9096A9CAB942B42B59C4EA93F1A7D61FCD6CBBC29C720EBD40CE674A55375862F00981E5D2F315A0982766A2004E0ED0AD9ADABEB506A638F1B829DBC2BE15979F22DA123523967F4D4069BC32098F1086F09AAA776CC365ED744633FD5FA7160B65A2C83539DF30134F5BE6272E46019AF9FD2423AFE12E1DC8642CDB56B8FEB9A4C1F30BF68EF431A3D4ABD3A7E44559E3E572210E5A5A33EC282D3445C537C5DA9DA598300A9900FA1B3B92983FD1504FDDFB34F89E409BF03EC662FC5734F25843C277A64B7C603156926FC6C74AA1D14AABEA6E20/subfile/castle.rock.s01e03.webrip.x264-tbs.ettv.-eng.ro.srt
+          file_name: castle.rock.s01e03.webrip.x264-tbs.ettv.-eng.ro.srt
+          requests: 3
+          remaining: 97
+          message: 'Your quota will be renewed in 07 hours and 40 minutes (2022-04-08
+            13:03:15 UTC) '
+          reset_time: 07 hours and 40 minutes
+          reset_time_utc: 2022-04-08T13:03:15.000Z
+    guessit_200_response:
+      description: ""
+      example:
+        video_codec: video_codec
+        other: other
+        year: 0.8008281904610115
+        streaming_service: streaming_service
+        audio_channels: audio_channels
+        language: language
+        source: source
+        audio_codec: audio_codec
+        release_group: release_group
+        title: title
+        type: type
+        screen_size: screen_size
+        subtitle_language: subtitle_language
+      properties:
+        title:
+          minLength: 1
+          type: string
+        year:
+          type: number
+        language:
+          minLength: 1
+          type: string
+        subtitle_language:
+          minLength: 1
+          type: string
+        screen_size:
+          minLength: 1
+          type: string
+        streaming_service:
+          minLength: 1
+          type: string
+        source:
+          minLength: 1
+          type: string
+        other:
+          minLength: 1
+          type: string
+        audio_codec:
+          minLength: 1
+          type: string
+        audio_channels:
+          minLength: 1
+          type: string
+        video_codec:
+          minLength: 1
+          type: string
+        release_group:
+          minLength: 1
+          type: string
+        type:
+          minLength: 1
+          type: string
+      required:
+      - audio_channels
+      - audio_codec
+      - language
+      - other
+      - release_group
+      - screen_size
+      - source
+      - streaming_service
+      - subtitle_language
+      - title
+      - type
+      - video_codec
+      - year
+      type: object
+    Subtitle_attributes_uploader:
+      example:
+        uploader_id: 9.301444243932576
+        name: name
+        rank: rank
+      properties:
+        uploader_id:
+          type: number
+        name:
+          type: string
+        rank:
+          type: string
+      required:
+      - name
+      - rank
+      type: object
+    Subtitle_attributes_feature_details:
+      example:
+        feature_id: 3.616076749251911
+        feature_type: feature_type
+        tmdb_id: 7.386281948385884
+        year: 2.027123023002322
+        imdb_id: 4.145608029883936
+        movie_name: movie_name
+        title: title
+      properties:
+        feature_id:
+          type: number
+        feature_type:
+          minLength: 1
+          type: string
+        year:
+          type: number
+        title:
+          minLength: 1
+          type: string
+        movie_name:
+          minLength: 1
+          type: string
+        imdb_id:
+          type: number
+        tmdb_id:
+          type: number
+      required:
+      - feature_id
+      - feature_type
+      - imdb_id
+      - movie_name
+      - title
+      - tmdb_id
+      - year
+      type: object
+    Subtitle_attributes_files_inner:
+      example:
+        ? ""
+        : ""
+        cd_number: 1.0246457001441578
+        file_name: file_name
+        file_id: 1.2315135367772556
+      properties:
+        file_id:
+          type: number
+        cd_number:
+          type: number
+        file_name:
+          minLength: 1
+          type: string
+        ? ""
+        : type: string
+      required:
+      - cd_number
+      - file_id
+      - file_name
+      type: object
+    Subtitle_attributes:
+      example:
+        legacy_subtitle_id: 7.061401241503109
+        comments: comments
+        related_links:
+        - "{}"
+        - "{}"
+        release: release
+        fps: 1.4658129805029452
+        language: language
+        feature_details:
+          feature_id: 3.616076749251911
+          feature_type: feature_type
+          tmdb_id: 7.386281948385884
+          year: 2.027123023002322
+          imdb_id: 4.145608029883936
+          movie_name: movie_name
+          title: title
+        subtitle_id: subtitle_id
+        from_trusted: true
+        url: url
+        download_count: 0.8008281904610115
+        points: 5.637376656633329
+        ai_translated: true
+        new_download_count: 6.027456183070403
+        foreign_parts_only: true
+        machine_translated: true
+        ratings: 2.3021358869347655
+        uploader:
+          uploader_id: 9.301444243932576
+          name: name
+          rank: rank
+        files:
+        - ? ""
+          : ""
+          cd_number: 1.0246457001441578
+          file_name: file_name
+          file_id: 1.2315135367772556
+        - ? ""
+          : ""
+          cd_number: 1.0246457001441578
+          file_name: file_name
+          file_id: 1.2315135367772556
+        hearing_impaired: true
+        votes: 5.962133916683182
+        hd: true
+        upload_date: upload_date
+      properties:
+        subtitle_id:
+          minLength: 1
+          type: string
+        language:
+          minLength: 1
+          type: string
+        download_count:
+          type: number
+        new_download_count:
+          type: number
+        hearing_impaired:
+          type: boolean
+        hd:
+          type: boolean
+        fps:
+          type: number
+        votes:
+          type: number
+        points:
+          type: number
+        ratings:
+          type: number
+        from_trusted:
+          type: boolean
+        foreign_parts_only:
+          type: boolean
+        ai_translated:
+          type: boolean
+        machine_translated:
+          type: boolean
+        upload_date:
+          minLength: 1
+          type: string
+        release:
+          minLength: 1
+          type: string
+        comments:
+          type: string
+        legacy_subtitle_id:
+          type: number
+        uploader:
+          $ref: '#/components/schemas/Subtitle_attributes_uploader'
+        feature_details:
+          $ref: '#/components/schemas/Subtitle_attributes_feature_details'
+        url:
+          minLength: 1
+          type: string
+        related_links:
+          items:
+            type: object
+          type: array
+        files:
+          items:
+            $ref: '#/components/schemas/Subtitle_attributes_files_inner'
+          minItems: 1
+          type: array
+          uniqueItems: true
+      required:
+      - ai_translated
+      - comments
+      - download_count
+      - feature_details
+      - files
+      - foreign_parts_only
+      - fps
+      - from_trusted
+      - hd
+      - hearing_impaired
+      - language
+      - legacy_subtitle_id
+      - machine_translated
+      - new_download_count
+      - points
+      - ratings
+      - related_links
+      - release
+      - subtitle_id
+      - upload_date
+      - uploader
+      - url
+      - votes
+      type: object
+    Feature_Tvshow_attributes_subtitles_counts:
+      example:
+        de: 4.8789878742268815
+        "no": 1.5970080735609526
+        fi: 7.203794749804894
+        ru: 5.6644160867523485
+        bg: 0.58919091925136
+        hr: 2.7977867356748476
+        fr: 4.518309517874243
+        hu: 3.804112695731078
+        zh-CN: 1.0639121808530916
+        bs: 1.3949519358941398
+        sk: 7.3718573971919445
+        sl: 9.386524999783381
+        id: 9.785002165136461
+        mk: 3.812761638325517
+        ca: 3.2841216543560217
+        sr: 2.535258963197524
+        sv: 6.173804034172511
+        ko: 7.726998920545485
+        zh-TW: 7.92839742024475
+        pt-BR: 9.897492629215506
+        el: 8.675064425986758
+        en: 3.111202833403195
+        it: 1.2555055362323109
+        es: 3.1497903714250555
+        et: 6.966044574347761
+        cs: 0.35262192099236644
+        ar: 4.332304821875894
+        pt-PT: 0.4768402382624515
+        vi: 5.7911894223693885
+        th: 4.372688051310086
+        ja: 5.974942028545841
+        fa: 3.8008573585058016
+        pl: 3.7814124730767915
+        ro: 5.877124706116695
+        he: 2.380090174313445
+        da: 9.806951670467935
+        nl: 7.835035282970782
+        tr: 0.4833312865174044
+      properties:
+        pl:
+          type: number
+        en:
+          type: number
+        pt-BR:
+          type: number
+        ro:
+          type: number
+        nl:
+          type: number
+        pt-PT:
+          type: number
+        es:
+          type: number
+        he:
+          type: number
+        hu:
+          type: number
+        el:
+          type: number
+        fr:
+          type: number
+        tr:
+          type: number
+        cs:
+          type: number
+        fi:
+          type: number
+        ar:
+          type: number
+        hr:
+          type: number
+        sl:
+          type: number
+        bg:
+          type: number
+        sr:
+          type: number
+        sv:
+          type: number
+        de:
+          type: number
+        et:
+          type: number
+        da:
+          type: number
+        bs:
+          type: number
+        it:
+          type: number
+        mk:
+          type: number
+        ru:
+          type: number
+        "no":
+          type: number
+        th:
+          type: number
+        vi:
+          type: number
+        ja:
+          type: number
+        fa:
+          type: number
+        zh-CN:
+          type: number
+        ca:
+          type: number
+        id:
+          type: number
+        sk:
+          type: number
+        ko:
+          type: number
+        zh-TW:
+          type: number
+      required:
+      - ar
+      - bg
+      - bs
+      - ca
+      - cs
+      - da
+      - de
+      - el
+      - en
+      - es
+      - et
+      - fa
+      - fi
+      - fr
+      - he
+      - hr
+      - hu
+      - id
+      - it
+      - ja
+      - ko
+      - mk
+      - nl
+      - "no"
+      - pl
+      - pt-BR
+      - pt-PT
+      - ro
+      - ru
+      - sk
+      - sl
+      - sr
+      - sv
+      - th
+      - tr
+      - vi
+      - zh-CN
+      - zh-TW
+      type: object
+    Feature_Tvshow_attributes_seasons_inner_episodes_inner:
+      example:
+        feature_id: 3.209082285545927
+        episode_number: 4.4935252719377825
+        feature_imdb_id: 8.262795412896967
+        title: title
+      properties:
+        episode_number:
+          type: number
+        title:
+          minLength: 1
+          type: string
+        feature_id:
+          type: number
+        feature_imdb_id:
+          type: number
+      required:
+      - episode_number
+      - feature_id
+      - feature_imdb_id
+      - title
+      type: object
+    Feature_Tvshow_attributes_seasons_inner:
+      example:
+        season_number: 1.7045651386993
+        episodes:
+        - feature_id: 3.209082285545927
+          episode_number: 4.4935252719377825
+          feature_imdb_id: 8.262795412896967
+          title: title
+        - feature_id: 3.209082285545927
+          episode_number: 4.4935252719377825
+          feature_imdb_id: 8.262795412896967
+          title: title
+      properties:
+        season_number:
+          type: number
+        episodes:
+          items:
+            $ref: '#/components/schemas/Feature_Tvshow_attributes_seasons_inner_episodes_inner'
+          minItems: 1
+          type: array
+          uniqueItems: true
+      required:
+      - season_number
+      type: object
+    Feature_Tvshow_attributes:
+      example:
+        feature_id: feature_id
+        tmdb_id: 7.606863723092579
+        seasons:
+        - season_number: 1.7045651386993
+          episodes:
+          - feature_id: 3.209082285545927
+            episode_number: 4.4935252719377825
+            feature_imdb_id: 8.262795412896967
+            title: title
+          - feature_id: 3.209082285545927
+            episode_number: 4.4935252719377825
+            feature_imdb_id: 8.262795412896967
+            title: title
+        - season_number: 1.7045651386993
+          episodes:
+          - feature_id: 3.209082285545927
+            episode_number: 4.4935252719377825
+            feature_imdb_id: 8.262795412896967
+            title: title
+          - feature_id: 3.209082285545927
+            episode_number: 4.4935252719377825
+            feature_imdb_id: 8.262795412896967
+            title: title
+        original_title: original_title
+        subtitles_count: 9.402167524121316
+        year: year
+        imdb_id: 8.37823741034869
+        img_url: img_url
+        title_aka:
+        - "{}"
+        - "{}"
+        title: title
+        url: url
+        subtitles_counts:
+          de: 4.8789878742268815
+          "no": 1.5970080735609526
+          fi: 7.203794749804894
+          ru: 5.6644160867523485
+          bg: 0.58919091925136
+          hr: 2.7977867356748476
+          fr: 4.518309517874243
+          hu: 3.804112695731078
+          zh-CN: 1.0639121808530916
+          bs: 1.3949519358941398
+          sk: 7.3718573971919445
+          sl: 9.386524999783381
+          id: 9.785002165136461
+          mk: 3.812761638325517
+          ca: 3.2841216543560217
+          sr: 2.535258963197524
+          sv: 6.173804034172511
+          ko: 7.726998920545485
+          zh-TW: 7.92839742024475
+          pt-BR: 9.897492629215506
+          el: 8.675064425986758
+          en: 3.111202833403195
+          it: 1.2555055362323109
+          es: 3.1497903714250555
+          et: 6.966044574347761
+          cs: 0.35262192099236644
+          ar: 4.332304821875894
+          pt-PT: 0.4768402382624515
+          vi: 5.7911894223693885
+          th: 4.372688051310086
+          ja: 5.974942028545841
+          fa: 3.8008573585058016
+          pl: 3.7814124730767915
+          ro: 5.877124706116695
+          he: 2.380090174313445
+          da: 9.806951670467935
+          nl: 7.835035282970782
+          tr: 0.4833312865174044
+      properties:
+        title:
+          minLength: 1
+          type: string
+        original_title:
+          minLength: 1
+          type: string
+        year:
+          minLength: 1
+          type: string
+        imdb_id:
+          type: number
+        tmdb_id:
+          type: number
+        title_aka:
+          items:
+            properties: {}
+            type: object
+          type: array
+        feature_id:
+          minLength: 1
+          type: string
+        url:
+          minLength: 1
+          type: string
+        img_url:
+          minLength: 1
+          type: string
+        subtitles_counts:
+          $ref: '#/components/schemas/Feature_Tvshow_attributes_subtitles_counts'
+        subtitles_count:
+          type: number
+        seasons:
+          items:
+            $ref: '#/components/schemas/Feature_Tvshow_attributes_seasons_inner'
+          minItems: 1
+          type: array
+          uniqueItems: true
+      required:
+      - feature_id
+      - imdb_id
+      - img_url
+      - original_title
+      - seasons
+      - subtitles_count
+      - subtitles_counts
+      - title
+      - title_aka
+      - tmdb_id
+      - url
+      - year
+      type: object
+    Feature_Episode_attributes_subtitles_counts:
+      example:
+        de: 9.183123594773994
+        "no": 0.4182561061793122
+        fi: 6.073898085781152
+        ru: 5.299143560275359
+        bg: 3.901545264248647
+        hr: 8.28965939814297
+        fr: 0.43431398824148815
+        hu: 8.251625748923757
+        bs: 1.8268702177058116
+        sl: 2.9409642974827896
+        mk: 8.761432466225475
+        sr: 6.623518433804886
+        sv: 8.863729185622827
+        pt-BR: 7.260521264802104
+        el: 1.7325933120207193
+        en: 4.678947989005849
+        es: 9.132027271330688
+        et: 4.573936264232251
+        cs: 4.86315908102884
+        ar: 4.459605034958679
+        pt-PT: 5.507386964179881
+        th: 9.254183946267839
+        pl: 1.041444916118296
+        ro: 0.8774076871421566
+        he: 7.933506881737151
+        da: 3.502657762086401
+        nl: 9.702963800023566
+        tr: 0.5199002018724985
+      properties:
+        pl:
+          type: number
+        en:
+          type: number
+        pt-BR:
+          type: number
+        es:
+          type: number
+        ro:
+          type: number
+        nl:
+          type: number
+        tr:
+          type: number
+        he:
+          type: number
+        pt-PT:
+          type: number
+        cs:
+          type: number
+        fi:
+          type: number
+        hu:
+          type: number
+        ar:
+          type: number
+        bg:
+          type: number
+        fr:
+          type: number
+        sl:
+          type: number
+        el:
+          type: number
+        hr:
+          type: number
+        sr:
+          type: number
+        et:
+          type: number
+        sv:
+          type: number
+        th:
+          type: number
+        bs:
+          type: number
+        da:
+          type: number
+        de:
+          type: number
+        mk:
+          type: number
+        "no":
+          type: number
+        ru:
+          type: number
+      required:
+      - ar
+      - bg
+      - bs
+      - cs
+      - da
+      - de
+      - el
+      - en
+      - es
+      - et
+      - fi
+      - fr
+      - he
+      - hr
+      - hu
+      - mk
+      - nl
+      - "no"
+      - pl
+      - pt-BR
+      - pt-PT
+      - ro
+      - ru
+      - sl
+      - sr
+      - sv
+      - th
+      - tr
+      type: object
+    Feature_Episode_attributes:
+      example:
+        feature_id: feature_id
+        parent_imdb_id: "{}"
+        tmdb_id: 4.258773108174356
+        original_title: "{}"
+        subtitles_count: 5.312489704336296
+        year: year
+        imdb_id: 6.628464275087742
+        title_aka:
+        - "{}"
+        - "{}"
+        season_number: 4.078845849666752
+        title: title
+        url: url
+        subtitles_counts:
+          de: 9.183123594773994
+          "no": 0.4182561061793122
+          fi: 6.073898085781152
+          ru: 5.299143560275359
+          bg: 3.901545264248647
+          hr: 8.28965939814297
+          fr: 0.43431398824148815
+          hu: 8.251625748923757
+          bs: 1.8268702177058116
+          sl: 2.9409642974827896
+          mk: 8.761432466225475
+          sr: 6.623518433804886
+          sv: 8.863729185622827
+          pt-BR: 7.260521264802104
+          el: 1.7325933120207193
+          en: 4.678947989005849
+          es: 9.132027271330688
+          et: 4.573936264232251
+          cs: 4.86315908102884
+          ar: 4.459605034958679
+          pt-PT: 5.507386964179881
+          th: 9.254183946267839
+          pl: 1.041444916118296
+          ro: 0.8774076871421566
+          he: 7.933506881737151
+          da: 3.502657762086401
+          nl: 9.702963800023566
+          tr: 0.5199002018724985
+        episode_number: 0.2025324113236393
+        img_url: img_url
+        parent_title: parent_title
+      properties:
+        title:
+          minLength: 1
+          type: string
+        original_title:
+          type: object
+        year:
+          minLength: 1
+          type: string
+        parent_imdb_id:
+          type: object
+        parent_title:
+          minLength: 1
+          type: string
+        season_number:
+          type: number
+        episode_number:
+          type: number
+        imdb_id:
+          type: number
+        tmdb_id:
+          type: number
+        title_aka:
+          items:
+            properties: {}
+            type: object
+          type: array
+        feature_id:
+          minLength: 1
+          type: string
+        url:
+          minLength: 1
+          type: string
+        img_url:
+          minLength: 1
+          type: string
+        subtitles_counts:
+          $ref: '#/components/schemas/Feature_Episode_attributes_subtitles_counts'
+        subtitles_count:
+          type: number
+      required:
+      - episode_number
+      - feature_id
+      - imdb_id
+      - img_url
+      - parent_title
+      - season_number
+      - subtitles_count
+      - subtitles_counts
+      - title
+      - title_aka
+      - tmdb_id
+      - url
+      - year
+      type: object
+    Feature_Movie_attributes_subtitles_counts:
+      example:
+        de: 9.965781217890562
+        "no": 3.5571952270680973
+        fi: 1.4658129805029452
+        ru: 8.969578798196912
+        bg: 4.965218492984954
+        lt: 7.058770351582356
+        hr: 9.018348186070783
+        fr: 1.4894159098541704
+        bn: 3.0937452626664474
+        zh-CN: 4.145608029883936
+        hu: 1.0246457001441578
+        uk: 6.704019297950036
+        ka: 7.143538047012306
+        sk: 5.944895607614016
+        sl: 6.84685269835264
+        id: 3.616076749251911
+        mk: 6.519180951018382
+        sr: 9.301444243932576
+        ml: 0.10263654006109402
+        sv: 6.965117697638846
+        ko: 6.438423552598547
+        zh-TW: 3.353193347011243
+        pt-BR: 5.962133916683182
+        ms: 4.652396432933246
+        el: 1.2315135367772556
+        en: 0.8008281904610115
+        it: 6.683562403749608
+        ze: 7.740351818741173
+        ta: 1.284659006116532
+        es: 5.637376656633329
+        et: 1.1730742509559433
+        cs: 5.025004791520295
+        eu: 2.8841621266687802
+        ar: 2.3021358869347655
+        pt-PT: 6.027456183070403
+        vi: 8.762042012749001
+        ja: 0.8851374739011653
+        fa: 6.878052220127876
+        pl: 7.061401241503109
+        ro: 2.027123023002322
+        he: 9.369310271410669
+        da: 6.778324963048013
+        nl: 7.386281948385884
+        tr: 7.457744773683766
+      properties:
+        en:
+          type: number
+        pt-PT:
+          type: number
+        fi:
+          type: number
+        pt-BR:
+          type: number
+        es:
+          type: number
+        ar:
+          type: number
+        pl:
+          type: number
+        sr:
+          type: number
+        id:
+          type: number
+        ro:
+          type: number
+        zh-CN:
+          type: number
+        nl:
+          type: number
+        el:
+          type: number
+        hu:
+          type: number
+        fr:
+          type: number
+        sl:
+          type: number
+        tr:
+          type: number
+        et:
+          type: number
+        bg:
+          type: number
+        cs:
+          type: number
+        de:
+          type: number
+        he:
+          type: number
+        it:
+          type: number
+        vi:
+          type: number
+        hr:
+          type: number
+        ko:
+          type: number
+        "no":
+          type: number
+        sv:
+          type: number
+        ta:
+          type: number
+        eu:
+          type: number
+        da:
+          type: number
+        fa:
+          type: number
+        sk:
+          type: number
+        uk:
+          type: number
+        zh-TW:
+          type: number
+        bn:
+          type: number
+        ka:
+          type: number
+        ja:
+          type: number
+        lt:
+          type: number
+        mk:
+          type: number
+        ml:
+          type: number
+        ms:
+          type: number
+        ru:
+          type: number
+        ze:
+          type: number
+      required:
+      - ar
+      - bg
+      - bn
+      - cs
+      - da
+      - de
+      - el
+      - en
+      - es
+      - et
+      - eu
+      - fa
+      - fi
+      - fr
+      - he
+      - hr
+      - hu
+      - id
+      - it
+      - ja
+      - ka
+      - ko
+      - lt
+      - mk
+      - ml
+      - ms
+      - nl
+      - "no"
+      - pl
+      - pt-BR
+      - pt-PT
+      - ro
+      - ru
+      - sk
+      - sl
+      - sr
+      - sv
+      - ta
+      - tr
+      - uk
+      - vi
+      - ze
+      - zh-CN
+      - zh-TW
+      type: object
+    Feature_Movie_attributes:
+      example:
+        feature_id: feature_id
+        tmdb_id: 3.2588565619047607
+        parent_imdb_id: "{}"
+        original_title: original_title
+        subtitles_count: 3.0205796992916243
+        year: year
+        imdb_id: 5.533258397034986
+        title_aka:
+        - "{}"
+        - "{}"
+        season_number: 7.04836565559697
+        title: title
+        url: url
+        subtitles_counts:
+          de: 9.965781217890562
+          "no": 3.5571952270680973
+          fi: 1.4658129805029452
+          ru: 8.969578798196912
+          bg: 4.965218492984954
+          lt: 7.058770351582356
+          hr: 9.018348186070783
+          fr: 1.4894159098541704
+          bn: 3.0937452626664474
+          zh-CN: 4.145608029883936
+          hu: 1.0246457001441578
+          uk: 6.704019297950036
+          ka: 7.143538047012306
+          sk: 5.944895607614016
+          sl: 6.84685269835264
+          id: 3.616076749251911
+          mk: 6.519180951018382
+          sr: 9.301444243932576
+          ml: 0.10263654006109402
+          sv: 6.965117697638846
+          ko: 6.438423552598547
+          zh-TW: 3.353193347011243
+          pt-BR: 5.962133916683182
+          ms: 4.652396432933246
+          el: 1.2315135367772556
+          en: 0.8008281904610115
+          it: 6.683562403749608
+          ze: 7.740351818741173
+          ta: 1.284659006116532
+          es: 5.637376656633329
+          et: 1.1730742509559433
+          cs: 5.025004791520295
+          eu: 2.8841621266687802
+          ar: 2.3021358869347655
+          pt-PT: 6.027456183070403
+          vi: 8.762042012749001
+          ja: 0.8851374739011653
+          fa: 6.878052220127876
+          pl: 7.061401241503109
+          ro: 2.027123023002322
+          he: 9.369310271410669
+          da: 6.778324963048013
+          nl: 7.386281948385884
+          tr: 7.457744773683766
+        feature_type: feature_type
+        episode_number: "{}"
+        seasons_count: 3.0576100241049344
+        img_url: img_url
+        parent_title: parent_title
+      properties:
+        title:
+          minLength: 1
+          type: string
+        original_title:
+          minLength: 1
+          type: string
+        year:
+          minLength: 1
+          type: string
+        subtitles_counts:
+          $ref: '#/components/schemas/Feature_Movie_attributes_subtitles_counts'
+        subtitles_count:
+          type: number
+        seasons_count:
+          type: number
+        parent_title:
+          type: string
+        season_number:
+          type: number
+        episode_number:
+          type: object
+        imdb_id:
+          type: number
+        tmdb_id:
+          type: number
+        parent_imdb_id:
+          type: object
+        feature_id:
+          minLength: 1
+          type: string
+        title_aka:
+          items:
+            properties: {}
+            type: object
+          type: array
+        feature_type:
+          minLength: 1
+          type: string
+        url:
+          minLength: 1
+          type: string
+        img_url:
+          minLength: 1
+          type: string
+      required:
+      - feature_id
+      - feature_type
+      - imdb_id
+      - img_url
+      - original_title
+      - parent_title
+      - season_number
+      - seasons_count
+      - subtitles_count
+      - subtitles_counts
+      - title
+      - title_aka
+      - tmdb_id
+      - url
+      - year
+      type: object
+  securitySchemes:
+    Api-Key:
+      description: Application API key obtained in the user profile of app developer
+        on opensubtitles.com to authorise the **application**
+      in: header
+      name: Api-Key
+      type: apiKey
+    Bearer:
+      bearerFormat: JWT
+      description: User token created in the login endpoint to authorise opensubtitles.com
+        **user**
+      scheme: bearer
+      type: http
+
