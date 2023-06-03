@@ -1,4 +1,4 @@
-# openapi-java-client
+# opensubtitles-retrofit-client
 
 ## Requirements
 
@@ -24,15 +24,14 @@ After the client library is installed/deployed, you can use it in your Maven pro
 
 ```xml
 <dependency>
-    <groupId>org.openapitools</groupId>
-    <artifactId>openapi-java-client</artifactId>
-    <version>1.0.1</version>
+    <groupId>nl.giejay.subtitles</groupId>
+    <artifactId>opensubtitles-retrofit-client</artifactId>
+    <version>1.0.0</version>
     <scope>compile</scope>
 </dependency>
 
 ```
 
 ## Author
-
-support@opensubtitles.org
+giejay
 
