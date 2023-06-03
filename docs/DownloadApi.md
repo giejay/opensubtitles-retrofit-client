@@ -20,25 +20,26 @@ Request a download url for a subtitle. Subtitle file in temporary URL will be al
 
 ```java
 // Import classes:
-import org.openapitools.client.ApiClient;
-import org.openapitools.client.ApiException;
-import org.openapitools.client.Configuration;
-import org.openapitools.client.auth.*;
-import org.openapitools.client.models.*;
-import org.openapitools.client.api.DownloadApi;
+
+import nl.giejay.subtitles.opensubtitles.ApiClient;
+import nl.giejay.subtitles.opensubtitles.ApiException;
+import nl.giejay.subtitles.opensubtitles.Configuration;
+import nl.giejay.subtitles.opensubtitles.auth.*;
+import nl.giejay.subtitles.opensubtitles.models.*;
+import nl.giejay.subtitles.opensubtitles.api.DownloadApi;
 
 public class Example {
     public static void main(String[] args) {
         ApiClient defaultClient = Configuration.getDefaultApiClient();
         defaultClient.setBasePath("https://api.opensubtitles.com/api/v1");
-        
+
         // Configure HTTP bearer authorization: Bearer
         HttpBearerAuth Bearer = (HttpBearerAuth) defaultClient.getAuthentication("Bearer");
         Bearer.setBearerToken("BEARER TOKEN");
 
         // Configure API key authorization: Api-Key
-        ApiKeyAuth Api-Key = (ApiKeyAuth) defaultClient.getAuthentication("Api-Key");
-        Api-Key.setApiKey("YOUR API KEY");
+        ApiKeyAuth Api -Key = (ApiKeyAuth) defaultClient.getAuthentication("Api-Key");
+        Api - Key.setApiKey("YOUR API KEY");
         // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
         //Api-Key.setApiKeyPrefix("Token");
 

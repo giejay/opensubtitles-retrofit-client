@@ -9,6 +9,13 @@
     <url>https://github.com/giejay/opensubtitles-retrofit-client</url>
     <description>OpenSubtitles.com Retrofit API client</description>
 
+    <distributionManagement>
+        <repository>
+            <id>reposilite</id>
+            <url>https://contabo.giejay.nl/releases</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
