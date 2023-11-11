@@ -1,8 +1,12 @@
 package nl.giejay.subtitles.opensubtitles.api;
 
 import nl.giejay.subtitles.opensubtitles.ApiClient;
+import nl.giejay.subtitles.opensubtitles.model.MostDownloaded200Response;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * API tests for DiscoverApi
@@ -13,7 +17,7 @@ public class DiscoverApiTest {
 
     @Before
     public void setup() {
-        api = new ApiClient().createService(DiscoverApi.class);
+        api = new ApiClient("Api-Key").setApiKey(System.getProperty("API-KEY")).createService(DiscoverApi.class);
     }
 
     /**
@@ -35,10 +39,11 @@ public class DiscoverApiTest {
      * Discover popular subtitles, according to last 30 days downloads on opensubtitles.com. This list can be filtered by language code or feature type (movie, episode)
      */
     @Test
-    public void mostDownloadedTest() {
-        String languages = null;
-        String type = null;
-        // MostDownloaded200Response response = api.mostDownloaded(languages, type);
+    @Ignore
+    public void mostDownloadedTest() throws IOException {
+        String languages = "en";
+        String type = "movie";
+         MostDownloaded200Response response = api.mostDownloaded(languages, type).execute().body();
 
         // TODO: test validations
     }

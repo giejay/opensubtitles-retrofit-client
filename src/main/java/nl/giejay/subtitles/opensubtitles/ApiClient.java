@@ -2,6 +2,7 @@ package nl.giejay.subtitles.opensubtitles;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import nl.giejay.subtitles.opensubtitles.auth.UserAgentInterceptor;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -32,7 +33,7 @@ public class ApiClient {
   public ApiClient() {
     apiAuthorizations = new LinkedHashMap<String, Interceptor>();
     createDefaultAdapter();
-    okBuilder = new OkHttpClient.Builder();
+    okBuilder = new OkHttpClient.Builder().addInterceptor(new UserAgentInterceptor());
   }
 
   public ApiClient(OkHttpClient client){

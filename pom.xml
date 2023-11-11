@@ -5,14 +5,14 @@
     <artifactId>opensubtitles-retrofit-client</artifactId>
     <packaging>jar</packaging>
     <name>opensubtitles-retrofit-client</name>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <url>https://github.com/giejay/opensubtitles-retrofit-client</url>
     <description>OpenSubtitles.com Retrofit API client</description>
 
     <distributionManagement>
         <repository>
             <id>reposilite</id>
-            <url>https://contabo.giejay.nl/releases</url>
+            <url>https://reposilite.giejay.nl/releases</url>
         </repository>
     </distributionManagement>
 
